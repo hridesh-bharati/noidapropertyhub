@@ -1,26 +1,42 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  --color-primary: #E65C1E;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Heebo', sans-serif;
+  background-color: #f8fafc;
+}
+
+/* Glassmorphism scroll integration */
+.sticky-nav-scroll {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  background-color: rgba(255, 255, 255, 0);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: triggerSticky linear both;
+  animation-timeline: scroll(root);
+  animation-range: 0px 60px;
+}
+
+@keyframes triggerSticky {
+  to {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px);
+    border-b: 1px solid rgba(241, 245, 249, 0.8);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Magnetic Link Optimization */
+.lg\:flex Link {
+  display: inline-block;
+  will-change: transform;
+  cursor: pointer;
 }
