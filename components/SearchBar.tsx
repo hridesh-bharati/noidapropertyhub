@@ -5,16 +5,20 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function SearchBar() {
-  const sectionRef = useRef(null);
-  const containerRef = useRef(null);
-  const titleRef = useRef(null);
-  const subtitleRef = useRef(null);
-  const inputRefs = useRef([]);
-  const buttonRef = useRef(null);
-  const tagsRef = useRef(null);
+  // 1. Properly type the refs
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const subtitleRef = useRef<HTMLParagraphElement>(null);
+  const inputRefs = useRef<(HTMLInputElement | HTMLSelectElement | null)[]>([]);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const tagsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // 2. Early return / Guard checks to satisfy TypeScript
+      if (!sectionRef.current || !containerRef.current || !buttonRef.current || !tagsRef.current) return;
+
       // Main section animation
       gsap.from(sectionRef.current, {
         opacity: 0,
@@ -37,32 +41,40 @@ export default function SearchBar() {
         }
       });
 
-      tl.from(titleRef.current, {
-        opacity: 0,
-        y: 40,
-        duration: 0.8,
-        ease: "power3.out"
-      })
-      .from(subtitleRef.current, {
-        opacity: 0,
-        y: 30,
-        duration: 0.6,
-        ease: "power3.out"
-      }, "-=0.3");
+      if (titleRef.current) {
+        tl.from(titleRef.current, {
+          opacity: 0,
+          y: 40,
+          duration: 0.8,
+          ease: "power3.out"
+        });
+      }
+      
+      if (subtitleRef.current) {
+        tl.from(subtitleRef.current, {
+          opacity: 0,
+          y: 30,
+          duration: 0.6,
+          ease: "power3.out"
+        }, "-=0.3");
+      }
 
-      // Inputs staggered animation
-      gsap.from(inputRefs.current, {
-        opacity: 0,
-        y: 50,
-        duration: 0.7,
-        stagger: 0.15,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 85%",
-          toggleActions: "play none none reverse"
-        }
-      });
+      // Filter out null elements from the array ref
+      const validInputs = inputRefs.current.filter(Boolean);
+      if (validInputs.length > 0) {
+        gsap.from(validInputs, {
+          opacity: 0,
+          y: 50,
+          duration: 0.7,
+          stagger: 0.15,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 85%",
+            toggleActions: "play none none reverse"
+          }
+        });
+      }
 
       // Button animation with bounce
       gsap.from(buttonRef.current, {
@@ -111,27 +123,33 @@ export default function SearchBar() {
         ease: "power1.inOut"
       });
 
-      // Hover animations
-      buttonRef.current.addEventListener('mouseenter', () => {
-        gsap.to(buttonRef.current, {
+      // Hover animations safely bound to current element variables
+      const currentButton = buttonRef.current;
+      
+      const onMouseEnter = () => {
+        gsap.to(currentButton, {
           scale: 1.08,
           boxShadow: "0 12px 40px rgba(139, 0, 0, 0.5)",
           duration: 0.3,
           ease: "power2.out"
         });
-      });
+      };
 
-      buttonRef.current.addEventListener('mouseleave', () => {
-        gsap.to(buttonRef.current, {
+      const onMouseLeave = () => {
+        gsap.to(currentButton, {
           scale: 1,
           boxShadow: "0 8px 30px rgba(139, 0, 0, 0.3)",
           duration: 0.3,
           ease: "power2.out"
         });
-      });
+      };
+
+      currentButton.addEventListener('mouseenter', onMouseEnter);
+      currentButton.addEventListener('mouseleave', onMouseLeave);
 
       // Input focus animations
-      inputRefs.current.forEach((input) => {
+      validInputs.forEach((input) => {
+        if (!input) return;
         input.addEventListener('focus', () => {
           gsap.to(input, {
             borderColor: "#8B0000",
@@ -208,7 +226,7 @@ export default function SearchBar() {
             <div className="md:col-span-3">
               <div className="relative">
                 <input
-                  ref={el => inputRefs.current[0] = el}
+                  ref={el => { inputRefs.current[0] = el; }}
                   type="text"
                   placeholder="Search keyword..."
                   className="w-full h-14 px-5 pr-12 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-700 placeholder-gray-400 outline-none transition-all duration-300"
@@ -223,7 +241,7 @@ export default function SearchBar() {
             <div className="md:col-span-3">
               <div className="relative">
                 <select
-                  ref={el => inputRefs.current[1] = el}
+                  ref={el => { inputRefs.current[1] = el; }}
                   className="w-full h-14 px-5 pr-12 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-700 outline-none appearance-none cursor-pointer transition-all duration-300"
                 >
                   <option value="">Property Type</option>
@@ -242,7 +260,7 @@ export default function SearchBar() {
             <div className="md:col-span-3">
               <div className="relative">
                 <select
-                  ref={el => inputRefs.current[2] = el}
+                  ref={el => { inputRefs.current[2] = el; }}
                   className="w-full h-14 px-5 pr-12 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-700 outline-none appearance-none cursor-pointer transition-all duration-300"
                 >
                   <option value="">Location</option>
