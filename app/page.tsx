@@ -8,7 +8,6 @@ import SearchBar from '@/components/SearchBar'
 import PropertyTypes from '@/components/PropertyTypes'
 import AboutSection from '@/components/AboutSection'
 import PropertyListing from '@/components/PropertyListing'
-import CallToAction from '@/components/CallToAction'
 import TeamSection from '@/components/TeamSection'
 import Testimonials from '@/components/Testimonials'
 import Footer from '@/components/Footer'
@@ -36,7 +35,7 @@ export default function Home() {
       <PropertyTypes />
       <AboutSection />
       <PropertyListing />
-      <CallToAction />
+      
       <TeamSection />
       <Testimonials />
       <Footer />

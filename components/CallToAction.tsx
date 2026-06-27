@@ -5,14 +5,27 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function CallToAction() {
-  const sectionRef = useRef(null);
-  const imageRef = useRef(null);
-  const contentRef = useRef(null);
-  const titleRef = useRef(null);
-  const descriptionRef = useRef(null);
-  const buttonsRef = useRef(null);
+  // 1. Explicitly type your refs so TypeScript knows they will hold DOM elements
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
+  const buttonsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // 2. Safely guard against null values before running animations
+    if (
+      !sectionRef.current ||
+      !imageRef.current ||
+      !contentRef.current ||
+      !titleRef.current ||
+      !descriptionRef.current ||
+      !buttonsRef.current
+    ) {
+      return;
+    }
+
     const ctx = gsap.context(() => {
       // Entrance animations
       gsap.from(sectionRef.current, {
@@ -64,8 +77,8 @@ export default function CallToAction() {
         duration: 0.6
       }, "-=0.3");
 
-      // Hover animation for buttons
-      const buttons = buttonsRef.current.querySelectorAll('a');
+      // Hover animation for buttons - NOW SAFE FROM TYPE ERRORS
+      const buttons = buttonsRef.current!.querySelectorAll('a');
       buttons.forEach(button => {
         button.addEventListener('mouseenter', () => {
           gsap.to(button, {
@@ -107,9 +120,8 @@ export default function CallToAction() {
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-indigo-500/10 to-purple-500/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/3"></div>
             
             <div className="relative p-8 md:p-12">
-              {/* FIXED: Proper flex layout with items-center */}
               <div className="flex flex-col lg:flex-row lg:items-center gap-8 lg:gap-12">
-                {/* Image section - 5/12 on large screens */}
+                {/* Image section */}
                 <div className="w-full lg:w-5/12 flex-shrink-0">
                   <div ref={imageRef} className="relative">
                     <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-blue-500/20 rounded-2xl transform rotate-3"></div>
@@ -118,7 +130,6 @@ export default function CallToAction() {
                       src="/img/call-to-action.jpg" 
                       alt="Contact Agent"
                     />
-                    {/* Floating badge */}
                     <div className="absolute -bottom-4 -right-4 bg-white rounded-xl shadow-lg px-4 py-2 flex items-center gap-2 animate-bounce">
                       <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                       <span className="text-sm font-semibold text-gray-700">Available Now</span>
@@ -126,7 +137,7 @@ export default function CallToAction() {
                   </div>
                 </div>
                 
-                {/* Content section - 7/12 on large screens */}
+                {/* Content section */}
                 <div ref={contentRef} className="w-full lg:w-7/12 flex-1">
                   <div className="space-y-6">
                     <div ref={titleRef}>
