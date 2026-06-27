@@ -87,8 +87,7 @@ export default function AboutSection() {
             </p>
             <p className="animate-text mb-4">
               <i className="fa fa-check text-primary me-3"></i>
-              Clita duo justo magna dolore erat amet
-            </p>
+              Clita duo justo magna dolore erat amet</p>
             <a className="animate-text btn-primary inline-block py-3 px-5 mt-3" href="#">
               Read More
             </a>
