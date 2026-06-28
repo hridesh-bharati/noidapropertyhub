@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
-import * as random from 'maath/random/dist/maath-random.esm';
 
 interface Testimonial {
   image: string;
@@ -35,29 +34,36 @@ const testimonials: Testimonial[] = [
   },
 ];
 
-// 1. Three.js Background Component (Floating Luxury Particles)
+// 1. Three.js Background Component (Zero Third-Party Dependencies)
 function BackgroundParticles() {
   const ref = useRef<any>();
-  // 500 तैरते हुए लक्ज़री पार्टिकल्स का स्फेयर जनरेट करना
-  const sphere = random.inSphere(new Float32Array(1500), { radius: 1.5 }) as Float32Array;
+  
+  // बिना किसी बाहरी लाइब्रेरी के 1200 पार्टिकल्स (400 x 3 coordinates) जनरेट करना
+  const [positions] = useState(() => {
+    const points = new Float32Array(1200);
+    for (let i = 0; i < points.length; i++) {
+      points[i] = (Math.random() - 0.5) * 2.5; // [-1.25, 1.25] के बीच रैंडम स्प्रेड
+    }
+    return points;
+  });
 
   useFrame((state, delta) => {
     if (ref.current) {
-      ref.current.rotation.x -= delta / 15;
-      ref.current.rotation.y -= delta / 20;
+      ref.current.rotation.x -= delta / 18;
+      ref.current.rotation.y -= delta / 22;
     }
   });
 
   return (
     <group rotation={[0, 0, Math.PI / 4]}>
-      <Points ref={ref} positions={sphere} stride={3} frustumCulled={false}>
+      <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
         <PointMaterial
           transparent
-          color="#f59e0b" // Amber / Gold color
-          size={0.006}
+          color="#f59e0b" // अंबर (गोल्डन) टोन
+          size={0.008}
           sizeAttenuation={true}
           depthWrite={false}
-          opacity={0.35}
+          opacity={0.4}
         />
       </Points>
     </group>
@@ -76,7 +82,6 @@ export default function Testimonials() {
     if (!containerRef.current) return;
     const q = gsap.utils.selector(containerRef);
 
-    // GSAP Timeline for Section Elements
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
@@ -85,13 +90,11 @@ export default function Testimonials() {
       }
     });
 
-    // हेडिंग और सब-टेक्स्ट का एनीमेशन
     tl.fromTo(q(".animate-header"), 
       { opacity: 0, y: 30 },
       { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
     );
 
-    // टेस्टिमोनियल कार्ड्स का प्रीमियम 3D स्केल-अप + स्टैगर इफ़ेक्ट
     tl.fromTo(q(".animate-card"),
       { opacity: 0, y: 50, scale: 0.95 },
       { opacity: 1, y: 0, scale: 1, duration: 1, stagger: 0.15, ease: "power4.out" },
@@ -108,8 +111,8 @@ export default function Testimonials() {
       ref={containerRef} 
       className="w-full bg-slate-950 py-24 sm:py-32 overflow-hidden relative min-h-screen flex items-center justify-center text-white"
     >
-      {/* Three.js 3D Interactive Canvas Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
+      {/* 3D Canvas Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-50">
         <Canvas camera={{ position: [0, 0, 1] }}>
           <BackgroundParticles />
         </Canvas>
@@ -138,7 +141,7 @@ export default function Testimonials() {
               key={index} 
               className="animate-card group relative bg-gradient-to-b from-slate-900/80 to-slate-950/90 backdrop-blur-md border border-slate-800/60 rounded-none p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-500 hover:border-amber-500/40"
             >
-              {/* Core Bootstrap Icon Quote - Absolute Premium Accent */}
+              {/* Core Bootstrap Icon Quote */}
               <div className="absolute top-6 right-8 text-slate-800 group-hover:text-amber-500/10 transition-colors duration-500 pointer-events-none">
                 <i className="bi bi-quote text-5xl leading-none"></i>
               </div>
@@ -159,7 +162,6 @@ export default function Testimonials() {
                       alt={testimonial.name}
                       style={{ width: '48px', height: '48px' }}
                     />
-                    {/* Tiny golden accent corner */}
                     <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-amber-500" />
                   </div>
                   
