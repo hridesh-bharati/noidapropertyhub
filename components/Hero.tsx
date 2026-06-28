@@ -7,27 +7,35 @@ import * as THREE from 'three'
 export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState<number>(0)
   const [isMobile, setIsMobile] = useState<boolean>(false)
-  
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    message: ''
+  })
+
   // DOM References
   const heroRef = useRef<HTMLDivElement>(null)
   const logoRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
   const subtextRef = useRef<HTMLParagraphElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
-  const contactBtnRef = useRef<HTMLButtonElement>(null)
-  const phoneLinkRef = useRef<HTMLAnchorElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+  const nameInputRef = useRef<HTMLInputElement>(null)
+  const phoneInputRef = useRef<HTMLInputElement>(null)
+  const messageInputRef = useRef<HTMLTextAreaElement>(null)
+  const submitBtnRef = useRef<HTMLButtonElement>(null)
   const bottomTextRef = useRef<HTMLSpanElement>(null)
+  const [showMobileForm, setShowMobileForm] = useState(false);
   
   // Three.js Canvas Reference
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  const slides = ['/img/hero1.webp', '/img/hero1.webp'] 
+  const slides = ['/img/home1.png', '/img/home2.png']
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length)
   }, [slides.length])
 
-  // Check if mobile on mount and resize
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768)
@@ -42,30 +50,42 @@ export default function Hero() {
     return () => clearInterval(interval)
   }, [nextSlide])
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const { name, phone, message } = formData
+    const whatsappMessage = `Hello NoidaPropertyHub!%0A%0AName: ${encodeURIComponent(name)}%0APhone: ${encodeURIComponent(phone)}%0AMessage: ${encodeURIComponent(message)}`
+    window.open(`https://wa.me/917267995307?text=${whatsappMessage}`, '_blank')
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
   // --- THREE.JS & GSAP INTEGRATION ---
   useEffect(() => {
     if (!canvasRef.current) return
 
-    // 1. Scene Setup
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
     const renderer = new THREE.WebGLRenderer({
       canvas: canvasRef.current,
       alpha: true,
-      antialias: !isMobile // Disable antialias on mobile for performance
+      antialias: !isMobile
     })
-    
+
     const resizeRenderer = () => {
       const width = heroRef.current?.clientWidth || window.innerWidth
       const height = heroRef.current?.clientHeight || 560
       renderer.setSize(width, height)
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2)) // Limit pixel ratio on mobile
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2))
       camera.aspect = width / height
       camera.updateProjectionMatrix()
     }
     resizeRenderer()
 
-    // 2. 3D Elements - Reduce particles on mobile
     const verticesCount = isMobile ? 150 : 400
     const geometry = new THREE.BufferGeometry()
     const posArray = new Float32Array(verticesCount * 3)
@@ -90,11 +110,10 @@ export default function Hero() {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
     scene.add(ambientLight)
 
-    // 3. Mouse Move Parallax - Disabled on mobile (touch devices)
     const mouse = { x: 0, y: 0 }
     const handleMouseMove = (event: MouseEvent) => {
-      if (isMobile) return // Skip on mobile
-      
+      if (isMobile) return
+
       mouse.x = (event.clientX / window.innerWidth) - 0.5
       mouse.y = (event.clientY / window.innerHeight) - 0.5
 
@@ -107,155 +126,126 @@ export default function Hero() {
     }
     window.addEventListener('mousemove', handleMouseMove)
 
-    // 4. Animation Loop
     const clock = new THREE.Clock()
     let animationFrameId: number
 
     const animate = () => {
       const elapsedTime = clock.getElapsedTime()
-      // Slower rotation on mobile
       particlesMesh.rotation.y = elapsedTime * (isMobile ? 0.03 : 0.05)
       renderer.render(scene, camera)
       animationFrameId = requestAnimationFrame(animate)
     }
     animate()
 
-    // 5. GSAP ANIMATIONS - Mobile Optimized
     const ctx = gsap.context(() => {
-      const masterTl = gsap.timeline({ 
-        defaults: { 
-          ease: 'power3.out', 
-          duration: isMobile ? 0.5 : 0.8 
+      const masterTl = gsap.timeline({
+        defaults: {
+          ease: 'power3.out',
+          duration: isMobile ? 0.5 : 0.8
         }
       })
 
-      // Logo Animation
-      masterTl.fromTo(logoRef.current, 
+      masterTl.fromTo(logoRef.current,
         { opacity: 0, y: isMobile ? -20 : -30 },
         { opacity: 1, y: 0, duration: isMobile ? 0.5 : 0.7 }
       )
-      .fromTo('.logo-bar', 
-        { scaleY: 0, transformOrigin: 'bottom' },
-        { scaleY: 1, stagger: isMobile ? 0.05 : 0.1, duration: 0.4 },
-        '-=0.3'
-      )
+        .fromTo('.logo-bar',
+          { scaleY: 0, transformOrigin: 'bottom' },
+          { scaleY: 1, stagger: isMobile ? 0.05 : 0.1, duration: 0.4 },
+          '-=0.3'
+        )
 
-      // Heading - Simplified animation on mobile
-      masterTl.fromTo(headingRef.current, 
-        { 
-          opacity: 0, 
-          x: isMobile ? -20 : -50, 
+      masterTl.fromTo(headingRef.current,
+        {
+          opacity: 0,
+          x: isMobile ? -20 : -50,
           y: isMobile ? 10 : 0,
           ...(isMobile ? {} : { rotationY: 15 })
         },
-        { 
-          opacity: 1, 
-          x: 0, 
+        {
+          opacity: 1,
+          x: 0,
           y: 0,
           ...(isMobile ? {} : { rotationY: 0 }),
-          duration: isMobile ? 0.6 : 0.9, 
-          ease: isMobile ? 'power2.out' : 'back.out(1.2)' 
+          duration: isMobile ? 0.6 : 0.9,
+          ease: isMobile ? 'power2.out' : 'back.out(1.2)'
         },
         '-=0.2'
       )
 
-      // Subtext
-      masterTl.fromTo(subtextRef.current, 
-        { 
-          opacity: 0, 
-          y: isMobile ? 15 : 30, 
+      masterTl.fromTo(subtextRef.current,
+        {
+          opacity: 0,
+          y: isMobile ? 15 : 30,
           ...(isMobile ? {} : { filter: 'blur(10px)' })
         },
-        { 
-          opacity: 1, 
-          y: 0, 
+        {
+          opacity: 1,
+          y: 0,
           ...(isMobile ? {} : { filter: 'blur(0px)' }),
-          duration: isMobile ? 0.5 : 0.7 
+          duration: isMobile ? 0.5 : 0.7
         },
         '-=0.3'
       )
 
-      // Contact Card - Simpler on mobile
-      masterTl.fromTo(cardRef.current, 
-        { 
-          opacity: 0, 
-          scale: isMobile ? 0.9 : 0.7, 
-          ...(isMobile ? { y: 20 } : { x: 100, rotationZ: -5 })
+      // Form Card Entrance - Zoom In Effect
+      masterTl.fromTo(cardRef.current,
+        {
+          opacity: 0,
+          scale: 0.3,
+          rotationZ: isMobile ? 0 : -5
         },
-        { 
-          opacity: 1, 
-          scale: 1, 
-          y: 0,
-          x: 0,
+        {
+          opacity: 1,
+          scale: 1,
           rotationZ: 0,
-          duration: isMobile ? 0.7 : 1,
-          ease: isMobile ? 'power2.out' : 'elastic.out(1, 0.8)'
+          duration: isMobile ? 0.8 : 1.2,
+          ease: 'back.out(1.7)'
         },
         '-=0.4'
       )
 
-      // Card inner elements
-      masterTl.fromTo('.card-inner > *', 
-        { opacity: 0, y: 10, scale: 0.95 },
-        { 
-          opacity: 1, 
-          y: 0, 
-          scale: 1, 
-          stagger: isMobile ? 0.1 : 0.15,
-          duration: 0.4,
+      // Form Fields Animation
+      masterTl.fromTo('.form-field',
+        { opacity: 0, x: -30, scale: 0.9 },
+        {
+          opacity: 1,
+          x: 0,
+          scale: 1,
+          stagger: 0.1,
+          duration: 0.5,
           ease: 'power2.out'
         },
         '-=0.5'
       )
 
-      // Contact Button
-      masterTl.fromTo(contactBtnRef.current,
-        { scale: 0.8, opacity: 0 },
-        { 
-          scale: 1, 
-          opacity: 1, 
-          duration: 0.4,
-          ease: 'back.out(1.5)'
-        },
+      // Submit Button - Left to Right
+      masterTl.fromTo(submitBtnRef.current,
+        { x: -50, opacity: 0, scale: 0.8 },
+        { x: 0, opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.5)' },
         '-=0.2'
       )
 
-      // Phone Link
-      masterTl.fromTo(phoneLinkRef.current,
-        { opacity: 0, x: isMobile ? 0 : 20, y: isMobile ? 10 : 0 },
-        { opacity: 1, x: 0, y: 0, duration: 0.4 },
-        '-=0.1'
-      )
-
-      // Bottom Text
       masterTl.fromTo(bottomTextRef.current,
-        { opacity: 0, y: 10 },
+        { opacity: 0, y: 15 },
         { opacity: 1, y: 0, duration: 0.3 },
         '-=0.1'
       )
 
-      // 3D Particles entrance - Faster on mobile
-      gsap.from(particlesMesh.scale, { 
-        x: 0, 
-        y: 0, 
-        z: 0, 
-        duration: isMobile ? 1 : 1.5, 
+      gsap.from(particlesMesh.scale, {
+        x: 0, y: 0, z: 0,
+        duration: isMobile ? 1 : 1.5,
         ease: 'power3.out',
         delay: 0.2
       })
-
-      // NO FLOATING/VIBRATING ANIMATIONS - Removed heading and card floating
-
     }, heroRef)
 
-    // Window Resize Handling
     const handleResize = () => {
       resizeRenderer()
       setIsMobile(window.innerWidth < 768)
     }
     window.addEventListener('resize', handleResize)
 
-    // Cleanup
     return () => {
       ctx.revert()
       window.removeEventListener('mousemove', handleMouseMove)
@@ -269,21 +259,21 @@ export default function Hero() {
 
   return (
     <div ref={heroRef} className="container-fluid p-0 m-0 bg-slate-950 w-full overflow-hidden relative">
-      <div className="relative w-full h-[400px] sm:h-[420px] md:h-[500px] lg:h-[560px]">
-        
+      <div className="relative w-full h-[500px] sm:h-[550px] md:h-[650px] lg:h-[720px]">
+
         {/* Carousel Background Section */}
-        <div className="absolute inset-0 w-full h-full z-0 pointer-events-none opacity-40">
+        <div className="absolute inset-0 w-full h-full z-0 pointer-events-none opacity-50 bg-slate-900">
           {slides.map((slide, index) => (
             <img
               key={index}
-              className={`w-full h-full object-cover absolute top-0 left-0 transition-opacity duration-700 ${
-                index === currentSlide ? 'opacity-100 z-0' : 'opacity-0 -z-10'
-              }`}
+              className={`w-full h-full object-cover absolute top-0 left-0 transition-opacity duration-1000 ${index === currentSlide ? 'opacity-100 scale-105 duration-[5000ms] ease-out z-0' : 'opacity-0 -z-10'
+                }`}
               src={slide}
               alt={`Property Banner ${index + 1}`}
               loading={index === 0 ? 'eager' : 'lazy'}
             />
           ))}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-900/40 to-transparent z-0" />
         </div>
 
         {/* THREE.JS 3D CANVAS LAYER */}
@@ -291,89 +281,142 @@ export default function Hero() {
 
         {/* Overlay Content Area */}
         <div className="absolute inset-0 w-full h-full pointer-events-none z-20 select-none">
-          <div className="relative w-full h-full max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 flex items-center">
-            
-            {/* Left Section: Branding & Main Typography */}
-            <div className="absolute left-[4%] sm:left-[6%] top-[10%] sm:top-[14%] bottom-[8%] flex flex-col justify-between max-w-[85%] sm:max-w-[60%] md:max-w-[50%] pointer-events-auto text-white">
-              
-              {/* Logo Layout */}
-              <div ref={logoRef} className="flex items-center space-x-2 mt-3">
-                <div className="flex items-end space-x-0.5 h-[14px] sm:h-[16px] md:h-[22px]">
-                  <div className="logo-bar w-[3px] sm:w-[3.5px] h-[50%] bg-white"></div>
-                  <div className="logo-bar w-[3px] sm:w-[3.5px] h-[100%] bg-white"></div>
-                  <div className="logo-bar w-[3px] sm:w-[3.5px] h-[70%] bg-white"></div>
+          <div className="relative w-full h-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
+
+            {/* Left Section: Branding */}
+            <div className="absolute left-[4%] sm:left-[6%] top-[10%] sm:top-[14%] bottom-[10%] flex flex-col justify-between max-w-[90%] sm:max-w-[65%] md:max-w-[55%] pointer-events-auto text-white">
+
+              <div ref={logoRef} className="flex items-center space-x-2.5 mt-13">
+                <div className="flex items-end space-x-0.5 h-[16px] sm:h-[18px] md:h-[24px]">
+                  <div className="logo-bar w-[3px] sm:w-[3.5px] h-[50%] bg-gradient-to-t from-sky-500 to-emerald-400 rounded-full"></div>
+                  <div className="logo-bar w-[3px] sm:w-[3.5px] h-[100%] bg-gradient-to-t from-sky-500 to-emerald-400 rounded-full"></div>
+                  <div className="logo-bar w-[3px] sm:w-[3.5px] h-[70%] bg-gradient-to-t from-sky-500 to-emerald-400 rounded-full"></div>
                 </div>
-                <span className="text-white text-xs sm:text-lg md:text-2xl font-bold tracking-tight">
-                  NoidaProperty<span className="font-normal opacity-95">Hb.com</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-400 text-sm sm:text-xl md:text-2xl font-black tracking-tight drop-shadow-sm">
+                  NoidaProperty<span className="font-light opacity-90 text-sky-400">Hub.com</span>
                 </span>
               </div>
 
-              {/* Main Heading & Subtitle */}
-              <div className="my-auto">
-                <h1 ref={headingRef} className="text-xl sm:text-4xl md:text-5xl lg:text-[56px] font-black uppercase tracking-wide leading-[1.1] sm:leading-[1.1] drop-shadow-md">
+              <div className="my-auto py-6">
+                <span className="block text-[9px] sm:text-xs md:text-sm font-bold tracking-[0.3em] text-emerald-400 uppercase mb-2 drop-shadow-md">
+                  // Premium Real Estate Hub
+                </span>
+
+                <h1 ref={headingRef} className="text-3xl sm:text-5xl md:text-6xl lg:text-[68px] font-black uppercase tracking-tight leading-[1.05] drop-shadow-2xl text-white">
                   Unlock Your <br />
-                  Dream Space <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-cyan-400 to-emerald-400 filter drop-shadow-[0_4px_12px_rgba(14,165,233,0.3)]">
+                    Dream Space
+                  </span> <br />
                   In Noida
                 </h1>
-                
-                <p ref={subtextRef} className="mt-2 sm:mt-4 text-[10px] sm:text-xs md:text-lg font-medium text-white opacity-95 tracking-wide max-w-[95%]">
-                  Premium Commercial & Luxury Residential Properties
+
+                <p ref={subtextRef} className="mt-4 sm:mt-6 text-[11px] sm:text-sm md:text-lg font-medium text-slate-300 tracking-wide max-w-[90%] border-l-2 border-emerald-500/50 pl-4 leading-relaxed">
+                  Explore Premium Commercial Assets & Ultra-Luxury Residential Spaces.
                 </p>
               </div>
-              
-              <div></div>
-            </div>
 
-            {/* Right Section: Slanted Contact Card - Mobile optimized */}
-            <div 
-              ref={cardRef} 
-              className="absolute top-[50%] right-[2%] sm:right-[5%] md:right-[8%] lg:right-[22%] bg-white/95 backdrop-blur-sm px-4 py-3 sm:px-6 sm:py-4 md:px-8 md:py-6 rounded-lg shadow-2xl flex flex-col items-center justify-center border border-gray-100 pointer-events-auto min-w-[180px] sm:min-w-[240px] md:min-w-[320px]"
-              style={{ 
-                transform: `translateY(-50%) ${isMobile ? 'skewX(0deg)' : 'skewX(-12deg)'}`,
-              }}
-            >
-              {/* Inner Content Container */}
-              <div 
-                className="card-inner w-full flex flex-col items-center justify-center"
-                style={{ 
-                  transform: isMobile ? 'skewX(0deg)' : 'skewX(12deg)',
-                }}
-              >
-                
-                {/* Contact Us Button */}
-                <button 
-                  ref={contactBtnRef}
-                  className="bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-bold text-xs sm:text-sm md:text-base uppercase tracking-wider px-4 py-1.5 sm:px-6 sm:py-2 md:px-8 md:py-2.5 rounded-full shadow-md active:from-emerald-700 active:to-teal-600 hover:from-emerald-700 hover:to-teal-600 transition-all duration-300 w-full text-center touch-manipulation"
-                >
-                  Contact Us
-                </button>
-                
-                {/* Phone Number Section */}
-                <a 
-                  ref={phoneLinkRef}
-                  href="tel:+917267995307" 
-                  className="mt-2 sm:mt-3 md:mt-4 flex items-center space-x-1.5 sm:space-x-2 text-slate-800 active:text-blue-600 hover:text-blue-600 transition-colors touch-manipulation"
-                >
-                  <div className="bg-teal-50 p-1 sm:p-1.5 md:p-2 rounded-full border border-teal-100">
-                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-teal-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-1C7.22 18 2 12.78 2 6V3z"/>
-                    </svg>
-                  </div>
-                  <span className="text-xs sm:text-sm md:text-lg font-extrabold whitespace-nowrap">
-                    CALL NOW: +91 7267995307
-                  </span>
-                </a>
-                
-                {/* Bottom Subtext */}
-                <span 
-                  ref={bottomTextRef}
-                  className="text-[8px] sm:text-[10px] md:text-xs text-gray-500 mt-1.5 sm:mt-2 font-medium tracking-wide uppercase"
-                >
-                  Explore Top Locations
-                </span>
+              <div className="text-[10px] text-slate-500 font-semibold uppercase tracking-widest hidden sm:block">
+                Authorized RERA Registered Projects Only
               </div>
             </div>
 
+            {/* Right Section: WhatsApp Form Card - Hide on Mobile */}
+            <div
+              ref={cardRef}
+              className="absolute hidden md:flex top-[56%] right-[5%] lg:right-[10%] bg-white/95 backdrop-blur-md px-5 py-4 sm:px-6 sm:py-5 md:px-7 md:py-6 rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,.5)] flex-col border border-white/20 pointer-events-auto min-w-[240px] sm:min-w-[280px] md:min-w-[320px]"
+              style={{ transform: "translateY(-50%)" }}
+            >
+              <div className="card-inner w-full">
+                <div className="text-center mb-3">
+                  <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">📱 WhatsApp Enquiry</span>
+                  <div className="w-10 h-0.5 bg-emerald-400/50 mx-auto mt-1.5 rounded-full"></div>
+                </div>
+
+                <form ref={formRef} onSubmit={handleSubmit} className="w-full">
+                  <div className="form-field mb-2.5">
+                    <input
+                      ref={nameInputRef}
+                      type="text"
+                      name="name"
+                      placeholder="Your Name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all placeholder:text-slate-400"
+                    />
+                  </div>
+
+                  <div className="form-field mb-2.5">
+                    <input
+                      ref={phoneInputRef}
+                      type="tel"
+                      name="phone"
+                      placeholder="Phone Number"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all placeholder:text-slate-400"
+                    />
+                  </div>
+
+                  <div className="form-field mb-3">
+                    <textarea
+                      ref={messageInputRef}
+                      name="message"
+                      placeholder="Your Message"
+                      rows={2}
+                      value={formData.message}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all placeholder:text-slate-400 resize-none"
+                    />
+                  </div>
+
+                  <button
+                    ref={submitBtnRef}
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 text-white font-black text-xs uppercase tracking-wider px-4 py-2.5 rounded-lg shadow-lg hover:shadow-emerald-500/30 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                    </svg>
+                    Send on WhatsApp
+                  </button>
+                </form>
+
+                <span
+                  ref={bottomTextRef}
+                  className="block text-[8px] text-slate-400 mt-2.5 text-center font-bold tracking-widest uppercase"
+                >
+                  Quick Response • 24/7 Support
+                </span>
+              </div>
+              
+            </div>
+            {/* Mobile Help / WhatsApp Floating Button */}
+            <div className="fixed bottom-18 right-5 md:hidden z-[9999]">
+              <button
+                onClick={() => setShowMobileForm(true)}
+                className="group relative w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 via-green-500 to-cyan-500 shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center"
+              >
+                {/* Ripple Animation */}
+                <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-20"></span>
+
+                {/* Icon */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="relative w-8 h-8 text-white"
+                >
+                  <path d="M20.52 3.48A11.83 11.83 0 0012.05 0C5.5 0 .16 5.34.16 11.89c0 2.09.55 4.14 1.59 5.95L0 24l6.47-1.7a11.88 11.88 0 005.58 1.43h.01c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.43-8.36zM12.06 21.8h-.01a9.92 9.92 0 01-5.04-1.38l-.36-.21-3.84 1.01 1.03-3.74-.24-.38a9.93 9.93 0 01-1.52-5.28C2.08 6.36 6.5 1.94 12.05 1.94c2.65 0 5.14 1.03 7.01 2.9a9.86 9.86 0 012.9 7.02c0 5.55-4.42 9.94-9.9 9.94z" />
+                </svg>
+
+                {/* Help Badge */}
+                <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center animate-bounce">
+                  ?
+                </span>
+              </button>
+            </div>
           </div>
         </div>
 

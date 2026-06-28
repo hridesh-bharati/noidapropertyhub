@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
 import PropertyCard from '@/components/PropertyCard'
 import SearchBar from '@/components/SearchBar'
+import LogoMarquee from '@/components/LogoMarquee'
 import TopLocations from '@/components/TopLocations'
 import AboutSection from '@/components/AboutSection'
 import PropertyListing from '@/components/PropertyListing'
@@ -33,15 +34,15 @@ export default function Home() {
       <SearchBar />
       <PropertyCard />
       <TopLocations />
+      <LogoMarquee />
       <AboutSection />
       <PropertyListing />
-      
-      <TeamSection />
       <Testimonials />
+      <TeamSection />
       <Footer />
       
       {/* Back to Top Button */}
-      <a 
+      {/* <a 
         href="#" 
         className="fixed bottom-5 right-5 bg-primary text-white p-3 rounded-full shadow-lg z-50 hover:bg-primary-600 transition-all"
         onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -50,7 +51,7 @@ export default function Home() {
         }}
       >
         <i className="bi bi-arrow-up"></i>
-      </a>
+      </a> */}
     </div>
   )
 }

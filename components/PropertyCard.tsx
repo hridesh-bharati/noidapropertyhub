@@ -132,9 +132,13 @@ export default function Property3DGrid() {
 
   return (
     <section className="py-24 bg-white relative overflow-hidden">
-      {/* प्रीमियम एम्बिएंट बैकग्राउंड ब्लर ओर्ब्स */}
-      <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-[10%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[140px] pointer-events-none" />
+      {/* ब्लूरेड ग्रेडिएंट ओर्ब्स - टॉप लेफ्ट (ब्लू) और बॉटम राइट (ग्रीन) */}
+      <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-400/20 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-emerald-400/15 rounded-full blur-[150px] pointer-events-none" />
+      
+      {/* ओवरलैपिंग सेकेंडरी ब्लर लेयर */}
+      <div className="absolute top-[30%] left-[20%] w-[300px] h-[300px] bg-indigo-300/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[30%] right-[20%] w-[300px] h-[300px] bg-teal-300/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
@@ -160,7 +164,7 @@ export default function Property3DGrid() {
           {propertyPlans.map((plan) => (
             <div 
               key={plan.id}
-              className="plan-card opacity-0 bg-slate-50/60 rounded-3xl overflow-hidden border border-slate-200/60 flex flex-col sm:flex-row shadow-sm hover:shadow-2xl hover:border-slate-300/80 group transition-all duration-500 backdrop-blur-md"
+              className="plan-card opacity-0 bg-white/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-200/60 flex flex-col sm:flex-row shadow-sm hover:shadow-2xl hover:border-slate-300/80 group transition-all duration-500"
             >
               
               {/* 3D Canvas Box Frame */}
@@ -180,7 +184,7 @@ export default function Property3DGrid() {
               </div>
 
               {/* Content Box Segment */}
-              <div className="p-6 w-full sm:w-[55%] flex flex-col justify-between bg-white/40 backdrop-blur-md">
+              <div className="p-6 w-full sm:w-[55%] flex flex-col justify-between bg-white/60 backdrop-blur-sm">
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-2">
                     <h3 className="text-md sm:text-lg font-black text-slate-900 tracking-tight group-hover:text-primary transition-colors">
@@ -199,7 +203,7 @@ export default function Property3DGrid() {
                       { icon: 'bi-tv', val: plan.living },
                       { icon: 'bi-egg-fried', val: plan.kitchen }
                     ].map((spec, sIdx) => (
-                      <div key={sIdx} className="flex items-center gap-2 p-2 rounded-xl bg-white border border-slate-100 shadow-sm">
+                      <div key={sIdx} className="flex items-center gap-2 p-2 rounded-xl bg-white/80 border border-slate-100 shadow-sm backdrop-blur-sm">
                         <i className={`bi ${spec.icon} text-primary text-xs`}></i>
                         <span className="text-[11px] font-bold text-slate-600 truncate">{spec.val}</span>
                       </div>

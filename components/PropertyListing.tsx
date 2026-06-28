@@ -170,13 +170,13 @@ export default function PropertyListing() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo('.listing-header-el', 
+      gsap.fromTo('.listing-header-el',
         { opacity: 0, y: 30 },
-        { 
-          opacity: 1, 
-          y: 0, 
-          duration: 0.8, 
-          stagger: 0.1, 
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.1,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: headerRef.current,
@@ -210,22 +210,22 @@ export default function PropertyListing() {
   }, [])
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="premium-gradient-bg py-24 sm:py-32 overflow-hidden"
     >
       {/* अतिरिक्त बैकग्राउंड डेकोरेशन फॉर वाइब्रेंट लुक */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-purple-500/10 to-pink-500/5 rounded-full blur-[160px] pointer-events-none" />
 
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-8 z-10">
-        
+      <div className="relative max-w-7xl mx-auto px-1 lg:px-8 z-10">
+
         {/* Colorful Header */}
         <div ref={headerRef} className="text-center max-w-3xl mx-auto mb-20">
-          <div className="listing-header-el inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-pink-500/10 to-blue-500/10 border border-pink-500/20 rounded-full mb-4 shadow-sm">
+          <div className="listing-header-el inline-flex items-center gap-2 px-1 py-1.5 bg-gradient-to-r from-pink-500/10 to-blue-500/10 border border-pink-500/20 rounded-full mb-4 shadow-sm">
             <span className="w-2 h-2 bg-pink-500 rounded-full animate-ping" />
             <span className="text-[10px] font-black tracking-widest text-pink-600 uppercase">Hot Properties</span>
           </div>
-          
+
           <h2 className="listing-header-el text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight mb-4">
             Discover Elite{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600">
@@ -238,9 +238,9 @@ export default function PropertyListing() {
         </div>
 
         {/* Colorful Cards Grid */}
-        <div 
+        <div
           ref={gridRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-2"
         >
           {allProperties.map((property) => (
             <div
@@ -259,17 +259,16 @@ export default function PropertyListing() {
                   className="card-image w-full h-full object-cover transition-all duration-500"
                   loading="lazy"
                 />
-                
+
                 {/* Neon Badges */}
                 <div className="absolute top-3 left-3 flex items-center gap-2">
-                  <span className={`px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-wider text-white shadow-md ${
-                    property.type === 'For Sell' 
-                      ? 'bg-gradient-to-r from-emerald-500 to-teal-600' 
+                  <span className={`px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-wider text-white shadow-md ${property.type === 'For Sell'
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-600'
                       : 'bg-gradient-to-r from-pink-500 to-purple-600'
-                  }`}>
+                    }`}>
                     {property.type === 'For Sell' ? 'Buy Now' : 'On Rent'}
                   </span>
-                  
+
                   {property.verified && (
                     <span className="p-1.5 bg-white/90 backdrop-blur-md rounded-xl text-blue-600 shadow-sm" title="Verified">
                       <i className="bi bi-patch-check-fill text-sm"></i>
@@ -311,9 +310,21 @@ export default function PropertyListing() {
                     {property.price}
                   </span>
                 </div>
-                
-                <button className="card-btn w-10 h-10 bg-slate-950 text-white rounded-xl flex items-center justify-center transition-all duration-300 shadow-md">
-                  <i className="bi bi-arrow-up-right-short text-xl font-bold"></i>
+
+                <button className="card-btn w-10 h-10 bg-slate-950 text-white rounded-xl flex items-center justify-center transition-all duration-300 shadow-md hover:bg-slate-900">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  >
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
                 </button>
               </div>
 
