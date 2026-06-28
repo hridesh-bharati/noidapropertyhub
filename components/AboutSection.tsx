@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link'
+
 export default function AboutSection() {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -15,6 +16,7 @@ export default function AboutSection() {
     if (!containerRef.current) return;
     const q = gsap.utils.selector(containerRef);
 
+    // एक बार में ही स्मूथ और क्लीन फेड-इन एनीमेशन
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
@@ -23,26 +25,24 @@ export default function AboutSection() {
       }
     });
 
-    // 1. प्रीमियम इमेज मास्क और स्केल इफ़ेक्ट (Left Column)
-    tl.fromTo(q(".animate-img-wrapper"), 
-      { clipPath: "polygon(0 0, 0 0, 0 100%, 0% 100%)", opacity: 0 },
-      { clipPath: "polygon(0 0, 100 0, 100% 100%, 0% 100%)", opacity: 1, duration: 1, ease: "power4.inOut" }
+    // 1. इमेज का सिंपल और क्लासी स्लाइड + स्केल रिवील
+    tl.fromTo(q(".animate-img-wrapper"),
+      { y: 50, opacity: 0 },
+      { y: 0, opacity: 1, duration: 1.2, ease: "power3.out" }
     );
 
-    tl.from(q(".animate-img"), {
-      scale: 1.15,
-      duration: 1.2,
-      ease: "power2.out"
-    }, "-=0.8");
+    tl.fromTo(q(".animate-img"),
+      { scale: 1.2 },
+      { scale: 1, duration: 1.6, ease: "power2.out" },
+      "-=1.2"
+    );
 
-    // 2. टेक्स्ट एलिमेंट्स का प्रीमियम फेड-अप और स्टैगर इफ़ेक्ट (Right Column)
-    tl.from(q(".animate-text"), {
-      opacity: 0,
-      y: 30,
-      duration: 0.7,
-      stagger: 0.08, 
-      ease: "power3.out"
-    }, "-=0.6");
+    // 2. टेक्स्ट का बिना किसी रोटेशन के क्लीन फेड-अप इफ़ेक्ट
+    tl.fromTo(q(".animate-text"),
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power3.out" },
+      "-=1.0"
+    );
 
     return () => {
       ScrollTrigger.getAll().forEach(t => t.kill());
@@ -50,73 +50,67 @@ export default function AboutSection() {
   }, []);
 
   return (
-    <section ref={containerRef} className="w-full bg-white py-16 sm:py-24 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+    <section ref={containerRef} className="w-full bg-slate-950 py-20 sm:py-28 overflow-hidden text-white">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           
-          {/* Left Column: Premium Image Setup with Floating Accent Frame */}
-          <div className="w-full relative px-4 sm:px-6">
-            {/* इमेज के पीछे का डिज़ाइनर बैकग्राउंड ब्लॉक */}
-            <div className="absolute -top-6 -left-2 sm:-left-6 w-48 h-48 bg-primary/10 rounded-3xl -z-10" />
-            <div className="absolute -bottom-6 -right-2 sm:-right-6 w-64 h-64 bg-slate-50 border border-slate-100 rounded-3xl -z-10 shadow-sm" />
+          {/* Left Column: Sharp Modern Image Block */}
+          <div className="w-full relative">
+            {/* कोई फालतू बैकग्राउंड डिब्बे नहीं, सिर्फ एक क्लीन बॉर्डर लाइन */}
+            <div className="absolute -inset-3 border border-slate-800 rounded-2xl -z-10 pointer-events-none" />
             
-            <div className="animate-img-wrapper w-full h-[320px] sm:h-[450px] rounded-3xl overflow-hidden shadow-2xl border border-slate-100 relative bg-slate-100">
-              
-                <img 
-                className=" w-full h-full object-cover" 
+            <div className="animate-img-wrapper w-full h-[350px] sm:h-[480px] rounded-xl overflow-hidden shadow-2xl relative bg-slate-900">
+              <img 
+                className="animate-img w-full h-full object-cover grayscale-[20%] hover:grayscale-0 transition-all duration-700" 
                 src="/img/about.jpg" 
                 alt="Premium Noida Hub Real Estate Properties"
               />
-           
-              {/* इमेज पर हल्का सा डार्क प्रीमियम टोन */}
-              <div className="absolute inset-0 bg-slate-950/5 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
             </div>
           </div>
           
-          {/* Right Column: Premium Typography and Features */}
-          <div className="w-full text-left flex flex-col justify-center">
+          {/* Right Column: Sharp Clean Typography */}
+          <div className="w-full flex flex-col justify-center">
             
-            <span className="animate-text text-[10px] sm:text-xs font-black tracking-[0.2em] text-primary uppercase mb-2 block">
+            <span className="animate-text text-[11px] font-bold tracking-[0.3em] text-amber-500 uppercase mb-3 block">
               About Our Premium Hub
             </span>
 
-            <h2 className="animate-text text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-none mb-5">
-              #1 Place To Find The <br className="hidden sm:inline" />Perfect Property
+            <h2 className="animate-text text-3xl sm:text-4xl lg:text-5xl font-light text-white tracking-tight leading-tight mb-6">
+              #1 Place To Find The <br />
+              <span className="font-serif italic text-amber-500 font-normal">Perfect Property</span>
             </h2>
             
-            <p className="animate-text text-xs sm:text-sm text-slate-400 font-medium leading-relaxed tracking-wide mb-6">
+            <p className="animate-text text-sm text-slate-400 font-normal leading-relaxed mb-8 max-w-xl">
               NoidaHub bridges the gap between luxury workspace design and strategic corporate placement. 
-              We curate office blocks and residential nodes inside India&apos;s most active economic corridors, 
-              ensuring your footprint aligns perfectly with future-ready growth.
+              We curate office blocks and residential nodes inside India's most active economic corridors.
             </p>
             
-            {/* प्रीमियम लिस्ट आइटम्स (सुंदर चेकमार्क आइकॉन के साथ) */}
-            <div className="space-y-3.5 mb-8">
+            {/* Minimal List Items */}
+            <div className="space-y-4 mb-10">
               {[
                 "Verified corporate structures and premium nodes",
                 "Direct leasing contracts with zero hidden overheads",
                 "Fully curated workspaces tailored for scalable growth"
               ].map((text, index) => (
-                <div key={index} className="animate-text flex items-center gap-3">
-                  <div className="w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-                    <svg className="w-3 h-3 text-primary" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+                <div key={index} className="animate-text flex items-start gap-3.5">
+                  <div className="w-5 h-5 rounded-full border border-slate-700 flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                   </div>
-                  <p className="text-xs sm:text-sm font-bold text-slate-700 tracking-wide">
+                  <p className="text-sm font-medium text-slate-300">
                     {text}
                   </p>
                 </div>
               ))}
             </div>
 
-            {/* प्रीमियम मैग्नेटिक बटन इफ़ेक्ट */}
+            {/* Premium Minimal Button */}
             <div className="animate-text">
               <Link 
                 href="/about" 
-                className="inline-block text-xs font-bold text-white bg-slate-950 px-6 py-3.5 rounded-full hover:bg-slate-900 transition-all shadow-lg hover:shadow-xl tracking-widest uppercase"
+                className="inline-block text-xs font-semibold tracking-widest text-slate-950 bg-white px-8 py-4 rounded-none hover:bg-amber-500 hover:text-slate-950 transition-all duration-300 uppercase"
               >
-                Read More Story
+                Read Our Story
               </Link>
             </div>
 
@@ -127,4 +121,3 @@ export default function AboutSection() {
     </section>
   );
 }
- 

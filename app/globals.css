@@ -1,5 +1,41 @@
 @import "tailwindcss";
 
+/* पिक्चर (image_0.png) जैसा प्रीमियम ग्रेडिएंट बैकग्राउंड */
+.premium-gradient-bg {
+  position: relative;
+  background-color: #ffffff; /* मुख्य सफेद पृष्ठभूमि */
+  width: 100%;
+  min-height: 100vh;
+  z-index: 0;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    width: 60%; /* या अपनी पसंद का आकार */
+    height: 60%;
+    border-radius: 50%;
+    filter: blur(150px); /* धुंधला प्रभाव */
+    opacity: 0.2; /* बहुत हल्का */
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* शीर्ष-बाएं गुलाबी ग्रेडिएंट */
+  &::before {
+    top: -10%;
+    left: -10%;
+    background: radial-gradient(circle, rgba(236, 72, 153, 0.5) 0%, rgba(236, 72, 153, 0) 70%);
+  }
+
+  /* नीचे-दाएं नीला ग्रेडिएंट */
+  &::after {
+    bottom: -10%;
+    right: -10%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.5) 0%, rgba(59, 130, 246, 0) 70%);
+  }
+}
+
 @theme {
   --color-primary: #E65C1E;
 }
@@ -40,7 +76,6 @@ body {
   will-change: transform;
   cursor: pointer;
 }
-
 
 .auth-body {
   background: linear-gradient(135deg, #0ea5e9 0%, #0d9488 50%, #111827 100%) !important;
