@@ -3,98 +3,128 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
+import Link from 'next/link'
 export default function AboutSection() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // SSR (Next.js) सेफ चेकिंग: सिर्फ क्लाइंट साइड पर ही रजिस्टर करें
     if (typeof window !== "undefined") {
       gsap.registerPlugin(ScrollTrigger);
     }
 
-    // अगर ref मौजूद नहीं है तो रुक जाएं
     if (!containerRef.current) return;
-
-    // इस कंपोनेंट के अंदर के ही एलिमेंट्स को सेलेक्ट करने के लिए
     const q = gsap.utils.selector(containerRef);
 
-    // Timeline बनाना
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "top 80%", // जब स्क्रीन के 80% हिस्से पर सेक्शन आए, तब शुरू हो
+        start: "top 75%", 
         toggleActions: "play none none none"
       }
     });
 
-    // 1. Image Animation (नीचे से ऊपर आना और ओपेसिटी बढ़ना)
-    tl.from(q(".animate-img"), {
-      opacity: 0,
-      y: 50,
-      duration: 0.8,
-      ease: "power2.out"
-    });
+    // 1. प्रीमियम इमेज मास्क और स्केल इफ़ेक्ट (Left Column)
+    tl.fromTo(q(".animate-img-wrapper"), 
+      { clipPath: "polygon(0 0, 0 0, 0 100%, 0% 100%)", opacity: 0 },
+      { clipPath: "polygon(0 0, 100 0, 100% 100%, 0% 100%)", opacity: 1, duration: 1, ease: "power4.inOut" }
+    );
 
-    // 2. Text Elements Animation (एक के बाद एक आना - Stagger)
+    tl.from(q(".animate-img"), {
+      scale: 1.15,
+      duration: 1.2,
+      ease: "power2.out"
+    }, "-=0.8");
+
+    // 2. टेक्स्ट एलिमेंट्स का प्रीमियम फेड-अप और स्टैगर इफ़ेक्ट (Right Column)
     tl.from(q(".animate-text"), {
       opacity: 0,
-      x: 30,
-      duration: 0.6,
-      stagger: 0.15, // हर टेक्स्ट के बीच 0.15 सेकंड का गैप
-      ease: "power2.out"
-    }, "-=0.4"); // इमेज एनीमेशन खत्म होने से थोड़ा पहले शुरू होगा
+      y: 30,
+      duration: 0.7,
+      stagger: 0.08, 
+      ease: "power3.out"
+    }, "-=0.6");
 
-    // Cleanup: जब कंपोनेंट हटे तो एनीमेशन और स्क्रॉल ट्रिगर को डिलीट कर दें
     return () => {
       ScrollTrigger.getAll().forEach(t => t.kill());
     };
   }, []);
 
   return (
-    <div ref={containerRef} className="py-5 overflow-hidden">
-      <div className="container mx-auto">
-        <div className="flex flex-wrap items-center">
+    <section ref={containerRef} className="w-full bg-white py-16 sm:py-24 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           
-          {/* Left Column: Image */}
-          <div className="w-full lg:w-1/2 mb-5 lg:mb-0">
-            <div className="about-img animate-img relative overflow-hidden p-5">
-              <img 
-                className="w-full h-auto rounded" 
+          {/* Left Column: Premium Image Setup with Floating Accent Frame */}
+          <div className="w-full relative px-4 sm:px-6">
+            {/* इमेज के पीछे का डिज़ाइनर बैकग्राउंड ब्लॉक */}
+            <div className="absolute -top-6 -left-2 sm:-left-6 w-48 h-48 bg-primary/10 rounded-3xl -z-10" />
+            <div className="absolute -bottom-6 -right-2 sm:-right-6 w-64 h-64 bg-slate-50 border border-slate-100 rounded-3xl -z-10 shadow-sm" />
+            
+            <div className="animate-img-wrapper w-full h-[320px] sm:h-[450px] rounded-3xl overflow-hidden shadow-2xl border border-slate-100 relative bg-slate-100">
+              
+                <img 
+                className=" w-full h-full object-cover" 
                 src="/img/about.jpg" 
-                alt="About Us"
+                alt="Premium Noida Hub Real Estate Properties"
               />
+           
+              {/* इमेज पर हल्का सा डार्क प्रीमियम टोन */}
+              <div className="absolute inset-0 bg-slate-950/5 pointer-events-none" />
             </div>
           </div>
           
-          {/* Right Column: Text Content */}
-          <div className="w-full lg:w-1/2 lg:pl-12">
-            <h1 className="animate-text mb-4 text-3xl font-bold">
-              #1 Place To Find The Perfect Property
-            </h1>
-            <p className="animate-text mb-4 text-gray-600">
-              Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam amet 
-              diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo 
-              justo magna dolore erat amet
+          {/* Right Column: Premium Typography and Features */}
+          <div className="w-full text-left flex flex-col justify-center">
+            
+            <span className="animate-text text-[10px] sm:text-xs font-black tracking-[0.2em] text-primary uppercase mb-2 block">
+              About Our Premium Hub
+            </span>
+
+            <h2 className="animate-text text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-none mb-5">
+              #1 Place To Find The <br className="hidden sm:inline" />Perfect Property
+            </h2>
+            
+            <p className="animate-text text-xs sm:text-sm text-slate-400 font-medium leading-relaxed tracking-wide mb-6">
+              NoidaHub bridges the gap between luxury workspace design and strategic corporate placement. 
+              We curate office blocks and residential nodes inside India&apos;s most active economic corridors, 
+              ensuring your footprint aligns perfectly with future-ready growth.
             </p>
-            <p className="animate-text mb-2">
-              <i className="fa fa-check text-primary me-3"></i>
-              Tempor erat elitr rebum at clita
-            </p>
-            <p className="animate-text mb-2">
-              <i className="fa fa-check text-primary me-3"></i>
-              Aliqu diam amet diam et eos
-            </p>
-            <p className="animate-text mb-4">
-              <i className="fa fa-check text-primary me-3"></i>
-              Clita duo justo magna dolore erat amet</p>
-            <a className="animate-text btn-primary inline-block py-3 px-5 mt-3" href="#">
-              Read More
-            </a>
+            
+            {/* प्रीमियम लिस्ट आइटम्स (सुंदर चेकमार्क आइकॉन के साथ) */}
+            <div className="space-y-3.5 mb-8">
+              {[
+                "Verified corporate structures and premium nodes",
+                "Direct leasing contracts with zero hidden overheads",
+                "Fully curated workspaces tailored for scalable growth"
+              ].map((text, index) => (
+                <div key={index} className="animate-text flex items-center gap-3">
+                  <div className="w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                    <svg className="w-3 h-3 text-primary" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <p className="text-xs sm:text-sm font-bold text-slate-700 tracking-wide">
+                    {text}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* प्रीमियम मैग्नेटिक बटन इफ़ेक्ट */}
+            <div className="animate-text">
+              <Link 
+                href="/about" 
+                className="inline-block text-xs font-bold text-white bg-slate-950 px-6 py-3.5 rounded-full hover:bg-slate-900 transition-all shadow-lg hover:shadow-xl tracking-widest uppercase"
+              >
+                Read More Story
+              </Link>
+            </div>
+
           </div>
 
         </div>
       </div>
-    </div>
+    </section>
   );
 }
+ 

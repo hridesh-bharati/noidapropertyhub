@@ -1,8 +1,12 @@
+"use client";
+
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function SearchBar() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -26,7 +30,6 @@ export default function SearchBar() {
         !statsRef.current
       ) return;
 
-      // 1. Instant Page Load Entrance (No scroll wait for above-the-fold elements)
       const entranceTl = gsap.timeline();
 
       if (titleRef.current) {
@@ -44,14 +47,12 @@ export default function SearchBar() {
         );
       }
 
-      // Card Fade/Scale Up
       entranceTl.fromTo(cardRef.current, 
         { opacity: 0, y: 30, scale: 0.98 },
         { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power3.out" },
         "-=0.2"
       );
 
-      // Inputs & Button Staggered Reveal with guaranteed final opacity 1
       const validInputs = inputRefs.current.filter(Boolean);
       const interactiveElements = [...validInputs, buttonRef.current];
       
@@ -61,7 +62,6 @@ export default function SearchBar() {
         "-=0.3"
       );
 
-      // Tags Entrance
       const tagElements = Array.from(tagsRef.current.children);
       entranceTl.fromTo(tagElements, 
         { opacity: 0, scale: 0.9, x: -5 },
@@ -69,7 +69,6 @@ export default function SearchBar() {
         "-=0.2"
       );
 
-      // Stats Grid Scroll Animation (Separate trigger as it's lower on page)
       const statItems = Array.from(statsRef.current.children);
       gsap.fromTo(statItems, 
         { opacity: 0, y: 25 },
@@ -87,17 +86,14 @@ export default function SearchBar() {
         }
       );
 
-
-      // 2. EXACTIVE INTERACTIVE HOVER / FOCUS EFFECTS
-
-      // Inputs Glow & Highlight
+      // INTERACTIVE HOVER EFFECTS (Updated Colors to Match Premium Palette)
       validInputs.forEach((input) => {
         if (!input) return;
         
         input.addEventListener('focus', () => {
           gsap.to(input, {
-            borderColor: '#0078d4',
-            boxShadow: '0 0 0 3px rgba(0, 120, 212, 0.25)',
+            borderColor: '#E65C1E', // फोकस करने पर आपके ब्रांड का ओरेंज कलर
+            boxShadow: '0 0 0 4px rgba(230, 92, 30, 0.2)',
             backgroundColor: '#ffffff',
             y: -1,
             duration: 0.2
@@ -106,9 +102,9 @@ export default function SearchBar() {
 
         input.addEventListener('blur', () => {
           gsap.to(input, {
-            borderColor: 'rgba(0, 0, 0, 0.18)',
+            borderColor: 'rgba(226, 232, 240, 0.8)',
             boxShadow: 'none',
-            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
             y: 0,
             duration: 0.2
           });
@@ -117,8 +113,8 @@ export default function SearchBar() {
         input.addEventListener('mouseenter', () => {
           if (document.activeElement === input) return;
           gsap.to(input, {
-            borderColor: 'rgba(0, 120, 212, 0.5)',
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            borderColor: 'rgba(230, 92, 30, 0.4)',
+            backgroundColor: '#ffffff',
             duration: 0.15
           });
         });
@@ -126,29 +122,28 @@ export default function SearchBar() {
         input.addEventListener('mouseleave', () => {
           if (document.activeElement === input) return;
           gsap.to(input, {
-            borderColor: 'rgba(0, 0, 0, 0.18)',
-            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            borderColor: 'rgba(226, 232, 240, 0.8)',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
             duration: 0.15
           });
         });
       });
 
-      // Search Button Interaction (Tactile Native Win11 Behavior)
       const currentButton = buttonRef.current;
       currentButton.addEventListener('mouseenter', () => {
         gsap.to(currentButton, {
-          backgroundColor: '#006cc1',
+          backgroundColor: '#cc4e14', // डीप ओरेंज होवर इफ़ेक्ट
           y: -1,
-          boxShadow: '0 4px 12px rgba(0, 120, 212, 0.3)',
+          boxShadow: '0 6px 20px rgba(230, 92, 30, 0.4)',
           duration: 0.2
         });
       });
 
       currentButton.addEventListener('mouseleave', () => {
         gsap.to(currentButton, {
-          backgroundColor: '#0078d4',
+          backgroundColor: '#E65C1E',
           y: 0,
-          boxShadow: '0 2px 6px rgba(0, 120, 212, 0.2)',
+          boxShadow: '0 4px 14px rgba(230, 92, 30, 0.25)',
           duration: 0.2
         });
       });
@@ -161,45 +156,43 @@ export default function SearchBar() {
         gsap.to(currentButton, { scale: 1, duration: 0.1 });
       });
 
-      // Tags Hover Action
       tagElements.forEach((tag) => {
         tag.addEventListener('mouseenter', () => {
           gsap.to(tag, {
-            backgroundColor: 'rgba(0, 120, 212, 0.12)',
-            borderColor: 'rgba(0, 120, 212, 0.4)',
-            color: '#0078d4',
+            backgroundColor: 'rgba(230, 92, 30, 0.1)',
+            borderColor: 'rgba(230, 92, 30, 0.4)',
+            color: '#E65C1E',
             y: -1,
             duration: 0.2
           });
         });
         tag.addEventListener('mouseleave', () => {
           gsap.to(tag, {
-            backgroundColor: 'rgba(255, 255, 255, 0.5)',
-            borderColor: 'rgba(0, 0, 0, 0.1)',
-            color: '#334155',
+            backgroundColor: 'rgba(255, 255, 255, 0.6)',
+            borderColor: 'rgba(226, 232, 240, 0.8)',
+            color: '#475569',
             y: 0,
             duration: 0.2
           });
         });
       });
 
-      // Stats Floating Highlight
       statItems.forEach((card) => {
         card.addEventListener('mouseenter', () => {
           gsap.to(card, {
-            y: -4,
-            backgroundColor: 'rgba(255, 255, 255, 0.6)',
-            borderColor: 'rgba(0, 120, 212, 0.25)',
-            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.04)',
+            y: -5,
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            borderColor: 'rgba(230, 92, 30, 0.3)',
+            boxShadow: '0 12px 24px -10px rgba(15, 23, 42, 0.1)',
             duration: 0.25
           });
         });
         card.addEventListener('mouseleave', () => {
           gsap.to(card, {
             y: 0,
-            backgroundColor: 'rgba(255, 255, 255, 0.35)',
-            borderColor: 'rgba(255, 255, 255, 0.4)',
-            boxShadow: 'none',
+            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+            borderColor: 'rgba(255, 255, 255, 0.6)',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)',
             duration: 0.25
           });
         });
@@ -213,30 +206,35 @@ export default function SearchBar() {
   return (
     <div 
       ref={sectionRef} 
-      className="py-20 px-4 bg-no-repeat bg-cover min-h-[600px] flex items-center"
+      className="py-24 px-4 min-h-[650px] flex items-center relative overflow-hidden"
       style={{ 
-        backgroundImage: 'linear-gradient(135deg, #f3f6fa 0%, #e4ecf5 40%, #d5e4f5 80%, #f3f6fa 100%)'
+        // सुधरा हुआ बैकग्राउंड: सुपर वाइब्रेंट, कलरफुल और मॉडर्न ग्रेडिएंट
+        backgroundImage: 'linear-gradient(135deg, #fef2eb 0%, #f1f5f9 50%, #e0f2fe 100%)'
       }}
     >
-      <div ref={containerRef} className="max-w-6xl mx-auto w-full">
+      {/* बैकग्राउंड में और गहराई देने के लिए कलरफुल एब्सोल्यूट ओर्ब्स (Orbs) */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-400/10 rounded-full blur-[120px] pointer-events-none" />
+
+      <div ref={containerRef} className="max-w-6xl mx-auto w-full relative z-10">
         
         {/* Header */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-12">
           <div ref={titleRef}>
-            <span className="inline-block px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-blue-700 mb-3 bg-white/70 border border-white/60 shadow-sm backdrop-blur-md">
+            <span className="inline-block px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest text-primary mb-4 bg-white/90 border border-primary/20 shadow-sm backdrop-blur-md">
               🌐 International Real Estate Registry
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-2">
-              Find Worldwide Properties
+            <h2 className="text-4xl md:text-6xl font-black tracking-tight text-slate-900 mb-3">
+              Find Worldwide <span className="text-primary">Properties</span>
             </h2>
           </div>
-          <p ref={subtitleRef} className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto font-normal">
+          <p ref={subtitleRef} className="text-slate-500 text-xs sm:text-sm md:text-base max-w-2xl mx-auto font-medium tracking-wide">
             Discover luxury residences and institutional-grade commercial investments globally.
           </p>
         </div>
 
-        {/* Windows 11 Acrylic Glassmorphism Card (Enhanced Border Contrast) */}
-        <div ref={cardRef} className="bg-white/30 rounded-xl shadow-xl shadow-slate-300/30 p-6 md:p-7 border border-white/60 backdrop-blur-3xl">
+        {/* ग्लास-मॉर्फिज्म सर्च कार्ड (हाई कॉन्ट्रास्ट और वाइब्रेंट लुक) */}
+        <div ref={cardRef} className="bg-white/70 rounded-3xl shadow-2xl shadow-slate-900/5 p-6 md:p-8 border border-white/80 backdrop-blur-xl">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             
             {/* Input 1 - Search */}
@@ -246,9 +244,9 @@ export default function SearchBar() {
                   ref={el => { inputRefs.current[0] = el; }}
                   type="text"
                   placeholder="City, neighborhood, or ZIP..."
-                  className="w-full h-12 px-4 pr-10 rounded-lg border border-black/20 bg-white/85 text-slate-900 placeholder-slate-400 outline-none text-sm font-medium shadow-sm transition-all duration-150"
+                  className="w-full h-13 px-4 pr-10 rounded-xl border border-slate-200 bg-white/90 text-slate-900 placeholder-slate-400 outline-none text-xs font-semibold shadow-inner transition-all duration-150"
                 />
-                <svg className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
@@ -259,14 +257,14 @@ export default function SearchBar() {
               <div className="relative">
                 <select
                   ref={el => { inputRefs.current[1] = el; }}
-                  className="w-full h-12 px-4 pr-10 rounded-lg border border-black/20 bg-white/85 text-slate-800 outline-none text-sm font-medium shadow-sm appearance-none cursor-pointer transition-all duration-150">
+                  className="w-full h-13 px-4 pr-10 rounded-xl border border-slate-200 bg-white/90 text-slate-700 outline-none text-xs font-semibold shadow-inner appearance-none cursor-pointer transition-all duration-150">
                   <option value="">Property Type</option>
                   <option value="1">Luxury Apartment</option>
                   <option value="2">Exclusive Villa</option>
                   <option value="3">Penthouse Suite</option>
                   <option value="4">Commercial Assets</option>
                 </select>
-                <svg className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
@@ -277,7 +275,7 @@ export default function SearchBar() {
               <div className="relative">
                 <select
                   ref={el => { inputRefs.current[2] = el; }}
-                  className="w-full h-12 px-4 pr-10 rounded-lg border border-black/20 bg-white/85 text-slate-800 outline-none text-sm font-medium shadow-sm appearance-none cursor-pointer transition-all duration-150"
+                  className="w-full h-13 px-4 pr-10 rounded-xl border border-slate-200 bg-white/90 text-slate-700 outline-none text-xs font-semibold shadow-inner appearance-none cursor-pointer transition-all duration-150"
                 >
                   <option value="">Global Location</option>
                   <option value="1">New York, USA</option>
@@ -285,17 +283,17 @@ export default function SearchBar() {
                   <option value="3">Dubai, UAE</option>
                   <option value="4">Tokyo, Japan</option>
                 </select>
-                <svg className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
             </div>
 
-            {/* Windows 11 Solid Accent Blue Button (100% High Visibility) */}
+            {/* एनिमेटेड ब्रांड ओरेंज एक्शन बटन */}
             <div className="md:col-span-3">
               <button
                 ref={buttonRef}
-                className="w-full h-12 rounded-lg text-white font-semibold text-sm tracking-wide bg-[#0078d4] border border-blue-600/30 shadow-md flex items-center justify-center gap-2 cursor-pointer select-none outline-none active:scale-[0.98]"
+                className="w-full h-13 rounded-xl text-white font-bold text-xs uppercase tracking-wider bg-primary border-none shadow-md shadow-primary/20 flex items-center justify-center gap-2 cursor-pointer select-none outline-none"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -306,27 +304,27 @@ export default function SearchBar() {
           </div>
 
           {/* Tags */}
-          <div ref={tagsRef} className="mt-5 flex flex-wrap items-center gap-2 text-xs">
-            <span className="text-slate-700 font-bold mr-1 uppercase tracking-wider">Trending:</span>
+          <div ref={tagsRef} className="mt-6 flex flex-wrap items-center gap-2 text-[11px]">
+            <span className="text-slate-800 font-black mr-1 uppercase tracking-wider">Trending:</span>
             {['Waterfront', 'Metropolitan', 'Historical', 'Penthouses', 'Eco-Luxury'].map((tag) => (
-              <button key={tag} className="px-3 py-1.5 rounded-md text-slate-700 font-semibold border border-black/10 bg-white/50 backdrop-blur-sm cursor-pointer outline-none">
+              <button key={tag} className="px-3.5 py-2 rounded-xl text-slate-600 font-bold border border-slate-200/80 bg-white/60 backdrop-blur-sm cursor-pointer outline-none transition-all">
                 {tag}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div ref={statsRef} className="mt-7 grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Stats Grid (कलरफुल और हाई-कॉन्ट्रास्ट लुक) */}
+        <div ref={statsRef} className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { metric: "12,000+", label: "Premium Listings" },
             { metric: "$4.2B+", label: "Transaction Volume" },
             { metric: "60+", label: "Countries Connected" },
             { metric: "99.4%", label: "Vetted Asset Rate" }
           ].map((stat, i) => (
-            <div key={i} className="text-center bg-white/35 p-4 rounded-xl border border-white/40 shadow-sm backdrop-blur-md">
-              <div className="text-2xl font-extrabold tracking-tight text-blue-700 mb-0.5">{stat.metric}</div>
-              <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{stat.label}</div>
+            <div key={i} className="text-center bg-white/70 p-5 rounded-2xl border border-white/60 shadow-sm backdrop-blur-md">
+              <div className="text-2xl sm:text-3xl font-black tracking-tight text-primary mb-0.5">{stat.metric}</div>
+              <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{stat.label}</div>
             </div>
           ))}
         </div>

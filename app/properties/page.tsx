@@ -255,21 +255,22 @@ export default function AllPropertiesPage() {
         setCategoryFilter('All')
     }
 
-    // GSAP Mobile Drawer Trigger Control
+    // GSAP Mobile Drawer Trigger Control Fix
     const toggleMobileDrawer = (open: boolean) => {
         if (open) {
             setIsMobileFilterOpen(true)
             document.body.style.overflow = 'hidden'
             gsap.killTweensOf([mobileDrawerRef.current, mobileOverlayRef.current])
 
-            gsap.set(mobileDrawerRef.current, { y: '-100%', opacity: 0 })
-            gsap.set(mobileOverlayRef.current, { opacity: 0, display: 'block' })
+            // Reset positioning before entry animation
+            gsap.set(mobileOverlayRef.current, { display: 'block', opacity: 0 })
+            gsap.set(mobileDrawerRef.current, { display: 'block', y: '-100%', opacity: 0 })
 
             gsap.to(mobileOverlayRef.current, { opacity: 1, duration: 0.3 })
             gsap.to(mobileDrawerRef.current, {
                 y: '0%',
                 opacity: 1,
-                duration: 0.5,
+                duration: 0.4,
                 ease: 'power3.out'
             })
         } else {
@@ -277,7 +278,7 @@ export default function AllPropertiesPage() {
             gsap.to(mobileDrawerRef.current, {
                 y: '-100%',
                 opacity: 0,
-                duration: 0.4,
+                duration: 0.3,
                 ease: 'power3.in'
             })
             gsap.to(mobileOverlayRef.current, {
@@ -285,6 +286,8 @@ export default function AllPropertiesPage() {
                 duration: 0.3,
                 onComplete: () => {
                     setIsMobileFilterOpen(false)
+                    if (mobileOverlayRef.current) mobileOverlayRef.current.style.display = 'none';
+                    if (mobileDrawerRef.current) mobileDrawerRef.current.style.display = 'none';
                     document.body.style.overflow = ''
                 }
             })
@@ -437,22 +440,27 @@ export default function AllPropertiesPage() {
                 </div>
             </div>
 
-            {/* Category Filter */}
+            {/* Category Filter Fix for Gradient visibility and active text hides */}
             <div className="filter-section mb-5">
                 <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-2">Space Configuration</label>
                 <div className="grid grid-cols-3 gap-1.5">
-                    {['All', 'Warehouse', 'Factory'].map(cat => (
-                        <button
-                            key={cat}
-                            onClick={() => setCategoryFilter(cat)}
-                            className={`filter-btn py-2 rounded-xl text-xs font-bold transition-all border ${categoryFilter === cat
-                                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/20 border-transparent'
-                                : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                                }`}
-                        >
-                            <span className="block text-[10px] tracking-wide">{cat}</span>
-                        </button>
-                    ))}
+                    {['All', 'Warehouse', 'Factory'].map(cat => {
+                        const isActive = categoryFilter === cat;
+                        return (
+                            <button
+                                key={cat}
+                                onClick={() => setCategoryFilter(cat)}
+                                className={`filter-btn py-2 rounded-xl text-xs font-bold transition-all border ${isActive
+                                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/20 border-transparent'
+                                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                                    }`}
+                            >
+                                <span className={`block text-[10px] tracking-wide ${isActive ? 'text-white font-black' : 'text-slate-600'}`}>
+                                    {cat}
+                                </span>
+                            </button>
+                        )
+                    })}
                 </div>
             </div>
 
@@ -574,15 +582,15 @@ export default function AllPropertiesPage() {
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.012)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.012)_1px,transparent_1px)] bg-[size:50px_50px]" />
             </div>
 
-            {/* GSAP MOBILE DRAWER SCREEN OVERLAY CONTAINER */}
+            {/* GSAP MOBILE DRAWER SCREEN OVERLAY CONTAINER (Fixed classes and display state) */}
             <div
                 ref={mobileOverlayRef}
                 onClick={() => toggleMobileDrawer(false)}
-                className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden opacity-0"
+                className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden opacity-0 lg:hidden"
             />
             <div
                 ref={mobileDrawerRef}
-                className="fixed top-0 inset-x-0 bg-white z-50 rounded-b-[28px] border-b border-slate-200 p-6 shadow-2xl max-h-[85vh] overflow-y-auto pointer-events-auto transform -translate-y-100% opacity-0 lg:hidden"
+                className="fixed top-0 inset-x-0 bg-white z-50 rounded-b-[28px] border-b border-slate-200 p-6 shadow-2xl max-h-[85vh] overflow-y-auto transform -translate-y-100% opacity-0 hidden lg:hidden"
             >
                 <div className="flex justify-end mb-2">
                     <button
@@ -763,7 +771,7 @@ export default function AllPropertiesPage() {
 
                                     <Link
                                         href={`/properties/${property.id}`}
-                                        className="w-full py-2.5 bg-slate-900 group-hover:bg-amber-500 text-white group-hover:text-slate-950 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2 select-none">
+                                        className="w-full py-2.5 bg-slate-900 group-hover:bg-amber-500 text-white group-hover:text-slate-950 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2 select-none mt-4">
                                         View Details
                                         <i className="bi bi-arrow-right-short text-base flex"></i>
                                     </Link>

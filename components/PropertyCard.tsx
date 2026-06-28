@@ -1,8 +1,14 @@
+'use client'
 import { useEffect, useRef, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as THREE from 'three';
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 interface PlanData {
   id: number;
@@ -13,85 +19,82 @@ interface PlanData {
   living: string;
   kitchen: string;
   image: string;
-  borderColor: string;
+  accentBadge: string;
 }
 
 const propertyPlans: PlanData[] = [
   {
     id: 1,
-    title: '1 BHK Design Daulat Park 1',
-    subtitle: '1 BHK designed specially for comfort living.',
-    beds: '01 Bedroom',
-    baths: '02 Bathrooms',
-    living: 'Living Room Included',
-    kitchen: 'Modular Kitchen',
-    image: '/img/h1.jpeg', // मेक श्योर यह फाइल public/img/h1.jpeg पाथ पर मौजूद हो
-    borderColor: 'border-l-[6px] border-red-700',
+    title: '1 BHK Design Comfort',
+    subtitle: 'Specially optimized for smart corporate living.',
+    beds: '1 Bed',
+    baths: '2 Baths',
+    living: 'Living Included',
+    kitchen: 'Modular Unit',
+    image: '/img/h1.jpeg', 
+    accentBadge: 'bg-primary/10 text-primary border-primary/20',
   },
   {
     id: 2,
     title: '2 BHK Luxury Suite',
     subtitle: 'Modern and spacious premium layout.',
-    beds: '02 Bedrooms',
-    baths: '02 Bathrooms',
-    living: 'Large Living & Dining',
-    kitchen: 'Open Concept Kitchen',
+    beds: '2 Beds',
+    baths: '2 Baths',
+    living: 'Large Living',
+    kitchen: 'Open Concept',
     image: '/img/h1.jpeg',
-    borderColor: 'border-l-[6px] border-purple-750',
+    accentBadge: 'bg-indigo-50 text-indigo-600 border-indigo-100',
   },
   {
     id: 3,
     title: '3 BHK Elegant Villa',
     subtitle: 'Perfect blend of luxury and convenience.',
-    beds: '03 Bedrooms',
-    baths: '03 Bathrooms',
-    living: 'Grand Living Hall',
-    kitchen: 'Spacious Kitchen + Pantry',
+    beds: '3 Beds',
+    baths: '3 Baths',
+    living: 'Grand Hall',
+    kitchen: 'Pantry Added',
     image: '/img/h1.jpeg',
-    borderColor: 'border-l-[6px] border-green-700',
+    accentBadge: 'bg-emerald-50 text-emerald-600 border-emerald-100',
   },
   {
     id: 4,
     title: 'Studio Apartment Smart',
     subtitle: 'Minimalist approach for urban professionals.',
-    beds: '01 Studio Bed',
-    baths: '01 Bathroom',
-    living: 'Integrated Living Space',
-    kitchen: 'Compact Kitchenette',
+    beds: '1 Studio',
+    baths: '1 Bath',
+    living: 'Integrated',
+    kitchen: 'Compact Kit',
     image: '/img/h1.jpeg',
-    borderColor: 'border-l-[6px] border-blue-700',
+    accentBadge: 'bg-blue-50 text-blue-600 border-blue-100',
   },
 ];
 
-// 3D Image Mesh Component
-// useTexture को सुरक्षित रूप से बिना try-catch के इस्तेमाल करें, Suspense इसे हैंडल करेगा
 function ThreeDImage({ imgUrl }: { imgUrl: string }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const texture = useTexture(imgUrl);
 
   useFrame((state) => {
     if (!meshRef.current) return;
-    const x = (state.pointer.x * Math.PI) / 8;
-    const y = (state.pointer.y * Math.PI) / 8;
+    const x = (state.pointer.x * Math.PI) / 10;
+    const y = (state.pointer.y * Math.PI) / 10;
     
-    meshRef.current.rotation.x = THREE.MathUtils.lerp(meshRef.current.rotation.x, -y, 0.1);
-    meshRef.current.rotation.y = THREE.MathUtils.lerp(meshRef.current.rotation.y, x, 0.1);
+    meshRef.current.rotation.x = THREE.MathUtils.lerp(meshRef.current.rotation.x, -y, 0.08);
+    meshRef.current.rotation.y = THREE.MathUtils.lerp(meshRef.current.rotation.y, x, 0.08);
   });
 
   return (
     <mesh ref={meshRef}>
-      <planeGeometry args={[3.6, 2.4]} />
-      <meshBasicMaterial map={texture} side={THREE.DoubleSide} />
+      <planeGeometry args={[3.8, 2.5]} />
+      <meshBasicMaterial map={texture} side={THREE.DoubleSide} transparent opacity={0.95} />
     </mesh>
   );
 }
 
-// जब तक 3D टेक्सचर लोड हो रहा है, तब तक दिखने वाला साफ़ लाइट फॉलबैक
 function FallbackMesh() {
   return (
     <mesh>
-      <planeGeometry args={[3.6, 2.4]} />
-      <meshBasicMaterial color="#f1f5f9" />
+      <planeGeometry args={[3.8, 2.5]} />
+      <meshBasicMaterial color="#f8fafc" />
     </mesh>
   );
 }
@@ -103,94 +106,110 @@ export default function Property3DGrid() {
     if (!containerRef.current) return;
 
     const cards = containerRef.current.querySelectorAll('.plan-card');
-    gsap.fromTo(
-      cards,
-      { opacity: 0, y: 40, scale: 0.98 },
+    
+    // सिनेमाई स्क्रॉल ट्रिगर एनीमेशन
+    gsap.fromTo(cards,
+      { opacity: 0, y: 50, scale: 0.97 },
       {
         opacity: 1,
         y: 0,
         scale: 1,
-        duration: 0.6,
-        stagger: 0.12,
-        ease: 'power2.out',
+        duration: 0.8,
+        stagger: 0.15,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 80%",
+          toggleActions: "play none none none"
+        }
       }
     );
+
+    return () => {
+      ScrollTrigger.getAll().forEach(t => t.kill());
+    };
   }, []);
 
   return (
-    // डार्क बैकग्राउंड हटाकर साफ़ और प्रीमियम लाइट बैकग्राउंड (bg-slate-50) दिया है
-    <div className="py-20 bg-slate-50 min-h-screen text-slate-800">
-      <div className="container mx-auto px-4">
+    <section className="py-24 bg-white relative overflow-hidden">
+      {/* प्रीमियम एम्बिएंट बैकग्राउंड ब्लर ओर्ब्स */}
+      <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-[10%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[140px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Header Section */}
-        <div className="text-center mx-auto mb-16 max-w-[600px]">
-          <h2 className="mb-4 text-4xl font-extrabold tracking-tight text-slate-900">
+        <div className="text-center mx-auto mb-16 max-w-2xl px-2">
+          <span className="inline-block px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-primary mb-3 bg-primary/10 border border-primary/20 shadow-sm">
+            📐 Architectural Innovation
+          </span>
+          <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 mb-4">
             Exclusive Floor Plans
           </h2>
-          <div className="w-20 h-1 bg-amber-500 mx-auto mb-4 rounded"></div>
-          <p className="text-slate-500">
-            Explore our state-of-the-art 3D layout architecture designs fine-tuned for high-end modern living.
+          <div className="w-12 h-0.5 bg-primary/50 mx-auto mb-5 rounded-full" />
+          <p className="text-xs sm:text-sm text-slate-400 font-medium leading-relaxed tracking-wide">
+            Explore our state-of-the-art 3D layout architecture designs fine-tuned for high-end modern living. Move your mouse over the floor plans to inspect angles.
           </p>
         </div>
 
         {/* 4 Cards Grid Layout */}
         <div 
           ref={containerRef} 
-          className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-6xl mx-auto"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto"
         >
           {propertyPlans.map((plan) => (
             <div 
               key={plan.id}
-              className={`plan-card opacity-0 bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl flex flex-col sm:flex-row transition-all duration-300 border border-slate-100 ${plan.borderColor}`}
+              className="plan-card opacity-0 bg-slate-50/60 rounded-3xl overflow-hidden border border-slate-200/60 flex flex-col sm:flex-row shadow-sm hover:shadow-2xl hover:border-slate-300/80 group transition-all duration-500 backdrop-blur-md"
             >
               
-              {/* 3D Canvas Box */}
-              <div className="w-full sm:w-1/2 h-56 sm:h-auto bg-slate-100 relative min-h-[220px]">
-                <Canvas camera={{ position: [0, 0, 2.5], fov: 50 }}>
-                  <ambientLight intensity={1.5} />
-                  {/* Suspense से लोडिंग एरर फिक्स हो गया */}
+              {/* 3D Canvas Box Frame */}
+              <div className="w-full sm:w-[45%] h-60 sm:h-auto bg-slate-100/80 relative overflow-hidden border-b sm:border-b-0 sm:border-r border-slate-200/50">
+                <Canvas camera={{ position: [0, 0, 2.4], fov: 50 }}>
+                  <ambientLight intensity={1.8} />
                   <Suspense fallback={<FallbackMesh />}>
                     <ThreeDImage imgUrl={plan.image} />
                   </Suspense>
                 </Canvas>
-                <div className="absolute bottom-3 right-3 bg-white/80 backdrop-blur-sm text-[10px] px-2 py-0.5 rounded-md pointer-events-none text-slate-600 font-medium shadow-sm">
-                  ★ Move Mouse to Tilt
+                
+                {/* फ्लोटिंग विजेट */}
+                <div className="absolute bottom-3 left-3 bg-slate-900/90 text-[9px] px-2.5 py-1 text-white font-bold rounded-lg pointer-events-none shadow-md uppercase tracking-wider backdrop-blur-sm flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  3D Interactive
                 </div>
               </div>
 
-              {/* Content Box */}
-              <div className="p-6 w-full sm:w-1/2 flex flex-col justify-between bg-white">
+              {/* Content Box Segment */}
+              <div className="p-6 w-full sm:w-[55%] flex flex-col justify-between bg-white/40 backdrop-blur-md">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-1 tracking-tight">
-                    {plan.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 mb-4 italic">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <h3 className="text-md sm:text-lg font-black text-slate-900 tracking-tight group-hover:text-primary transition-colors">
+                      {plan.title}
+                    </h3>
+                  </div>
+                  <p className="text-[11px] text-slate-400 font-medium tracking-wide mb-5">
                     {plan.subtitle}
                   </p>
                   
-                  {/* Property Specs */}
-                  <div className="space-y-2 border-t border-slate-100 pt-4">
-                    <div className="flex items-center text-sm font-medium text-slate-600">
-                      <span className="w-2 h-2 rounded-full bg-amber-500 mr-2.5"></span>
-                      {plan.beds}
-                    </div>
-                    <div className="flex items-center text-sm font-medium text-slate-600">
-                      <span className="w-2 h-2 rounded-full bg-amber-500 mr-2.5"></span>
-                      {plan.baths}
-                    </div>
-                    <div className="flex items-center text-sm font-medium text-slate-600">
-                      <span className="w-2 h-2 rounded-full bg-amber-500 mr-2.5"></span>
-                      {plan.living}
-                    </div>
-                    <div className="flex items-center text-sm font-medium text-slate-600">
-                      <span className="w-2 h-2 rounded-full bg-amber-500 mr-2.5"></span>
-                      {plan.kitchen}
-                    </div>
+                  {/* Property Specs - Modern Grid Nodes instead of traditional list */}
+                  <div className="grid grid-cols-2 gap-2 border-t border-slate-100 pt-4">
+                    {[
+                      { icon: 'bi-door-open', val: plan.beds },
+                      { icon: 'bi-droplet', val: plan.baths },
+                      { icon: 'bi-tv', val: plan.living },
+                      { icon: 'bi-egg-fried', val: plan.kitchen }
+                    ].map((spec, sIdx) => (
+                      <div key={sIdx} className="flex items-center gap-2 p-2 rounded-xl bg-white border border-slate-100 shadow-sm">
+                        <i className={`bi ${spec.icon} text-primary text-xs`}></i>
+                        <span className="text-[11px] font-bold text-slate-600 truncate">{spec.val}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <button className="mt-6 w-full py-2.5 bg-slate-900 hover:bg-amber-500 hover:text-white text-white rounded-xl font-semibold text-sm transition-colors duration-300 shadow-sm">
-                  View Details
+                {/* प्रीमियम बटन */}
+                <button className="mt-6 w-full py-3 bg-slate-950 hover:bg-primary text-white font-bold rounded-xl text-xs uppercase tracking-widest transition-all duration-300 shadow-md shadow-slate-900/5 hover:shadow-primary/20">
+                  View Specifications
                 </button>
               </div>
 
@@ -199,6 +218,6 @@ export default function Property3DGrid() {
         </div>
 
       </div>
-    </div>
+    </section>
   );
 }

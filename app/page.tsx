@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
 import PropertyCard from '@/components/PropertyCard'
 import SearchBar from '@/components/SearchBar'
-import PropertyTypes from '@/components/PropertyTypes'
+import TopLocations from '@/components/TopLocations'
 import AboutSection from '@/components/AboutSection'
 import PropertyListing from '@/components/PropertyListing'
 import TeamSection from '@/components/TeamSection'
@@ -32,7 +32,7 @@ export default function Home() {
       <Hero />
       <SearchBar />
       <PropertyCard />
-      <PropertyTypes />
+      <TopLocations />
       <AboutSection />
       <PropertyListing />
       
