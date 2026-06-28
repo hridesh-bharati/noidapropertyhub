@@ -40,3 +40,12 @@ body {
   will-change: transform;
   cursor: pointer;
 }
+
+
+.auth-body {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0d9488 50%, #111827 100%) !important;
+}
+
+.auth-card {
+  background: rgba(255, 255, 255, 0.95);
+}

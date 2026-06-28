@@ -5,192 +5,202 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function SearchBar() {
-  // 1. Properly type the refs
   const sectionRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const inputRefs = useRef<(HTMLInputElement | HTMLSelectElement | null)[]>([]);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const tagsRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // 2. Early return / Guard checks to satisfy TypeScript
-      if (!sectionRef.current || !containerRef.current || !buttonRef.current || !tagsRef.current) return;
+      if (
+        !sectionRef.current || 
+        !containerRef.current || 
+        !cardRef.current || 
+        !buttonRef.current || 
+        !tagsRef.current || 
+        !statsRef.current
+      ) return;
 
-      // Main section animation
-      gsap.from(sectionRef.current, {
-        opacity: 0,
-        y: 80,
-        duration: 1.2,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 80%",
-          toggleActions: "play none none reverse"
-        }
-      });
-
-      // Title and subtitle animation
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 85%",
-          toggleActions: "play none none reverse"
-        }
-      });
+      // 1. Instant Page Load Entrance (No scroll wait for above-the-fold elements)
+      const entranceTl = gsap.timeline();
 
       if (titleRef.current) {
-        tl.from(titleRef.current, {
-          opacity: 0,
-          y: 40,
-          duration: 0.8,
-          ease: "power3.out"
-        });
-      }
-      
-      if (subtitleRef.current) {
-        tl.from(subtitleRef.current, {
-          opacity: 0,
-          y: 30,
-          duration: 0.6,
-          ease: "power3.out"
-        }, "-=0.3");
+        entranceTl.fromTo(titleRef.current, 
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
+        );
       }
 
-      // Filter out null elements from the array ref
+      if (subtitleRef.current) {
+        entranceTl.fromTo(subtitleRef.current, 
+          { opacity: 0, y: 10 },
+          { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 
+          "-=0.3"
+        );
+      }
+
+      // Card Fade/Scale Up
+      entranceTl.fromTo(cardRef.current, 
+        { opacity: 0, y: 30, scale: 0.98 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power3.out" },
+        "-=0.2"
+      );
+
+      // Inputs & Button Staggered Reveal with guaranteed final opacity 1
       const validInputs = inputRefs.current.filter(Boolean);
-      if (validInputs.length > 0) {
-        gsap.from(validInputs, {
-          opacity: 0,
-          y: 50,
-          duration: 0.7,
-          stagger: 0.15,
-          ease: "power3.out",
+      const interactiveElements = [...validInputs, buttonRef.current];
+      
+      entranceTl.fromTo(interactiveElements, 
+        { opacity: 0, y: 15, scale: 0.97 },
+        { opacity: 1, y: 0, scale: 1, stagger: 0.05, duration: 0.4, ease: "power2.out" },
+        "-=0.3"
+      );
+
+      // Tags Entrance
+      const tagElements = Array.from(tagsRef.current.children);
+      entranceTl.fromTo(tagElements, 
+        { opacity: 0, scale: 0.9, x: -5 },
+        { opacity: 1, scale: 1, x: 0, stagger: 0.03, duration: 0.3, ease: "power2.out" },
+        "-=0.2"
+      );
+
+      // Stats Grid Scroll Animation (Separate trigger as it's lower on page)
+      const statItems = Array.from(statsRef.current.children);
+      gsap.fromTo(statItems, 
+        { opacity: 0, y: 25 },
+        { 
+          opacity: 1, 
+          y: 0, 
+          stagger: 0.08, 
+          duration: 0.6, 
+          ease: "power2.out",
           scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 85%",
+            trigger: statsRef.current,
+            start: "top 95%",
             toggleActions: "play none none reverse"
           }
-        });
-      }
-
-      // Button animation with bounce
-      gsap.from(buttonRef.current, {
-        opacity: 0,
-        scale: 0.7,
-        duration: 0.8,
-        delay: 0.4,
-        ease: "back.out(1.7)",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 85%",
-          toggleActions: "play none none reverse"
         }
-      });
+      );
 
-      // Tags animation
-      gsap.from(tagsRef.current.children, {
-        opacity: 0,
-        scale: 0.8,
-        duration: 0.5,
-        stagger: 0.08,
-        delay: 0.6,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 85%",
-          toggleActions: "play none none reverse"
-        }
-      });
 
-      // Button floating animation
-      gsap.to(buttonRef.current, {
-        y: -4,
-        duration: 2.5,
-        repeat: -1,
-        yoyo: true,
-        ease: "power1.inOut"
-      });
+      // 2. EXACTIVE INTERACTIVE HOVER / FOCUS EFFECTS
 
-      // Button pulse glow
-      gsap.to(buttonRef.current, {
-        boxShadow: "0 8px 30px rgba(139, 0, 0, 0.4)",
-        duration: 1.5,
-        repeat: -1,
-        yoyo: true,
-        ease: "power1.inOut"
-      });
-
-      // Hover animations safely bound to current element variables
-      const currentButton = buttonRef.current;
-      
-      const onMouseEnter = () => {
-        gsap.to(currentButton, {
-          scale: 1.08,
-          boxShadow: "0 12px 40px rgba(139, 0, 0, 0.5)",
-          duration: 0.3,
-          ease: "power2.out"
-        });
-      };
-
-      const onMouseLeave = () => {
-        gsap.to(currentButton, {
-          scale: 1,
-          boxShadow: "0 8px 30px rgba(139, 0, 0, 0.3)",
-          duration: 0.3,
-          ease: "power2.out"
-        });
-      };
-
-      currentButton.addEventListener('mouseenter', onMouseEnter);
-      currentButton.addEventListener('mouseleave', onMouseLeave);
-
-      // Input focus animations
+      // Inputs Glow & Highlight
       validInputs.forEach((input) => {
         if (!input) return;
+        
         input.addEventListener('focus', () => {
           gsap.to(input, {
-            borderColor: "#8B0000",
-            boxShadow: "0 0 0 5px rgba(139, 0, 0, 0.08)",
-            scale: 1.03,
-            backgroundColor: "#ffffff",
-            duration: 0.3,
-            ease: "power2.out"
+            borderColor: '#0078d4',
+            boxShadow: '0 0 0 3px rgba(0, 120, 212, 0.25)',
+            backgroundColor: '#ffffff',
+            y: -1,
+            duration: 0.2
           });
         });
 
         input.addEventListener('blur', () => {
           gsap.to(input, {
-            borderColor: "#e5e7eb",
-            boxShadow: "none",
-            scale: 1,
-            backgroundColor: "#f9fafb",
-            duration: 0.3,
-            ease: "power2.out"
+            borderColor: 'rgba(0, 0, 0, 0.18)',
+            boxShadow: 'none',
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            y: 0,
+            duration: 0.2
+          });
+        });
+
+        input.addEventListener('mouseenter', () => {
+          if (document.activeElement === input) return;
+          gsap.to(input, {
+            borderColor: 'rgba(0, 120, 212, 0.5)',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            duration: 0.15
+          });
+        });
+
+        input.addEventListener('mouseleave', () => {
+          if (document.activeElement === input) return;
+          gsap.to(input, {
+            borderColor: 'rgba(0, 0, 0, 0.18)',
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            duration: 0.15
           });
         });
       });
 
-      // Tag hover animations
-      Array.from(tagsRef.current.children).forEach(tag => {
+      // Search Button Interaction (Tactile Native Win11 Behavior)
+      const currentButton = buttonRef.current;
+      currentButton.addEventListener('mouseenter', () => {
+        gsap.to(currentButton, {
+          backgroundColor: '#006cc1',
+          y: -1,
+          boxShadow: '0 4px 12px rgba(0, 120, 212, 0.3)',
+          duration: 0.2
+        });
+      });
+
+      currentButton.addEventListener('mouseleave', () => {
+        gsap.to(currentButton, {
+          backgroundColor: '#0078d4',
+          y: 0,
+          boxShadow: '0 2px 6px rgba(0, 120, 212, 0.2)',
+          duration: 0.2
+        });
+      });
+
+      currentButton.addEventListener('mousedown', () => {
+        gsap.to(currentButton, { scale: 0.97, duration: 0.1 });
+      });
+
+      currentButton.addEventListener('mouseup', () => {
+        gsap.to(currentButton, { scale: 1, duration: 0.1 });
+      });
+
+      // Tags Hover Action
+      tagElements.forEach((tag) => {
         tag.addEventListener('mouseenter', () => {
           gsap.to(tag, {
-            scale: 1.1,
-            backgroundColor: "#8B0000",
-            color: "#ffffff",
-            duration: 0.3,
-            ease: "power2.out"
+            backgroundColor: 'rgba(0, 120, 212, 0.12)',
+            borderColor: 'rgba(0, 120, 212, 0.4)',
+            color: '#0078d4',
+            y: -1,
+            duration: 0.2
           });
         });
         tag.addEventListener('mouseleave', () => {
           gsap.to(tag, {
-            scale: 1,
-            backgroundColor: "#f3f4f6",
-            color: "#6b7280",
-            duration: 0.3,
-            ease: "power2.out"
+            backgroundColor: 'rgba(255, 255, 255, 0.5)',
+            borderColor: 'rgba(0, 0, 0, 0.1)',
+            color: '#334155',
+            y: 0,
+            duration: 0.2
+          });
+        });
+      });
+
+      // Stats Floating Highlight
+      statItems.forEach((card) => {
+        card.addEventListener('mouseenter', () => {
+          gsap.to(card, {
+            y: -4,
+            backgroundColor: 'rgba(255, 255, 255, 0.6)',
+            borderColor: 'rgba(0, 120, 212, 0.25)',
+            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.04)',
+            duration: 0.25
+          });
+        });
+        card.addEventListener('mouseleave', () => {
+          gsap.to(card, {
+            y: 0,
+            backgroundColor: 'rgba(255, 255, 255, 0.35)',
+            borderColor: 'rgba(255, 255, 255, 0.4)',
+            boxShadow: 'none',
+            duration: 0.25
           });
         });
       });
@@ -201,141 +211,126 @@ export default function SearchBar() {
   }, []);
 
   return (
-    <div ref={sectionRef} className="py-16 px-4 bg-gradient-to-b from-gray-50 to-white">
-      <div ref={containerRef} className="max-w-6xl mx-auto">
-        {/* Header Section */}
+    <div 
+      ref={sectionRef} 
+      className="py-20 px-4 bg-no-repeat bg-cover min-h-[600px] flex items-center"
+      style={{ 
+        backgroundImage: 'linear-gradient(135deg, #f3f6fa 0%, #e4ecf5 40%, #d5e4f5 80%, #f3f6fa 100%)'
+      }}
+    >
+      <div ref={containerRef} className="max-w-6xl mx-auto w-full">
+        
+        {/* Header */}
         <div className="text-center mb-10">
           <div ref={titleRef}>
-            <span className="inline-block px-4 py-1.5 rounded-full text-sm font-semibold text-white mb-4" 
-                  style={{ background: 'linear-gradient(135deg, #8B0000, #660000)' }}>
-              Find Your Dream Home
+            <span className="inline-block px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-blue-700 mb-3 bg-white/70 border border-white/60 shadow-sm backdrop-blur-md">
+              🌐 International Real Estate Registry
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
-              Search Properties
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-2">
+              Find Worldwide Properties
             </h2>
           </div>
-          <p ref={subtitleRef} className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Discover the perfect property with our advanced search tool
+          <p ref={subtitleRef} className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto font-normal">
+            Discover luxury residences and institutional-grade commercial investments globally.
           </p>
         </div>
 
-        {/* Search Box */}
-        <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 border border-gray-100">
+        {/* Windows 11 Acrylic Glassmorphism Card (Enhanced Border Contrast) */}
+        <div ref={cardRef} className="bg-white/30 rounded-xl shadow-xl shadow-slate-300/30 p-6 md:p-7 border border-white/60 backdrop-blur-3xl">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-            {/* Search Input */}
+            
+            {/* Input 1 - Search */}
             <div className="md:col-span-3">
               <div className="relative">
                 <input
                   ref={el => { inputRefs.current[0] = el; }}
                   type="text"
-                  placeholder="Search keyword..."
-                  className="w-full h-14 px-5 pr-12 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-700 placeholder-gray-400 outline-none transition-all duration-300"
+                  placeholder="City, neighborhood, or ZIP..."
+                  className="w-full h-12 px-4 pr-10 rounded-lg border border-black/20 bg-white/85 text-slate-900 placeholder-slate-400 outline-none text-sm font-medium shadow-sm transition-all duration-150"
                 />
-                <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
             </div>
 
-            {/* Property Type */}
+            {/* Input 2 - Property Type */}
             <div className="md:col-span-3">
               <div className="relative">
                 <select
                   ref={el => { inputRefs.current[1] = el; }}
-                  className="w-full h-14 px-5 pr-12 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-700 outline-none appearance-none cursor-pointer transition-all duration-300"
-                >
+                  className="w-full h-12 px-4 pr-10 rounded-lg border border-black/20 bg-white/85 text-slate-800 outline-none text-sm font-medium shadow-sm appearance-none cursor-pointer transition-all duration-150">
                   <option value="">Property Type</option>
-                  <option value="1">🏢 Apartment</option>
-                  <option value="2">🏡 Villa</option>
-                  <option value="3">🏘️ House</option>
-                  <option value="4">🏬 Commercial</option>
+                  <option value="1">Luxury Apartment</option>
+                  <option value="2">Exclusive Villa</option>
+                  <option value="3">Penthouse Suite</option>
+                  <option value="4">Commercial Assets</option>
                 </select>
-                <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                <svg className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
             </div>
 
-            {/* Location */}
+            {/* Input 3 - Location */}
             <div className="md:col-span-3">
               <div className="relative">
                 <select
                   ref={el => { inputRefs.current[2] = el; }}
-                  className="w-full h-14 px-5 pr-12 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-700 outline-none appearance-none cursor-pointer transition-all duration-300"
+                  className="w-full h-12 px-4 pr-10 rounded-lg border border-black/20 bg-white/85 text-slate-800 outline-none text-sm font-medium shadow-sm appearance-none cursor-pointer transition-all duration-150"
                 >
-                  <option value="">Location</option>
-                  <option value="1">🗽 New York</option>
-                  <option value="2">🌴 Los Angeles</option>
-                  <option value="3">🌆 Chicago</option>
-                  <option value="4">🏖️ Miami</option>
+                  <option value="">Global Location</option>
+                  <option value="1">New York, USA</option>
+                  <option value="2">London, UK</option>
+                  <option value="3">Dubai, UAE</option>
+                  <option value="4">Tokyo, Japan</option>
                 </select>
-                <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                <svg className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
             </div>
 
-            {/* Search Button */}
+            {/* Windows 11 Solid Accent Blue Button (100% High Visibility) */}
             <div className="md:col-span-3">
               <button
                 ref={buttonRef}
-                className="w-full h-14 rounded-xl text-white font-semibold text-lg transition-all duration-300 relative overflow-hidden group"
-                style={{
-                  background: 'linear-gradient(135deg, #8B0000, #660000)',
-                  boxShadow: '0 4px 20px rgba(139, 0, 0, 0.3)'
-                }}
+                className="w-full h-12 rounded-lg text-white font-semibold text-sm tracking-wide bg-[#0078d4] border border-blue-600/30 shadow-md flex items-center justify-center gap-2 cursor-pointer select-none outline-none active:scale-[0.98]"
               >
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  Search Now
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 transform -translate-x-full group-hover:translate-x-full transition-all duration-1000"></div>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                Search Registry
               </button>
             </div>
           </div>
 
-          {/* Popular Tags */}
-          <div ref={tagsRef} className="mt-6 flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-gray-500 font-medium mr-2">🔥 Popular:</span>
-            <button className="px-4 py-1.5 rounded-full bg-gray-100 text-gray-600 transition-all duration-300 hover:bg-red-700 hover:text-white border-2 border-transparent hover:border-red-700">
-              Luxury Homes
-            </button>
-            <button className="px-4 py-1.5 rounded-full bg-gray-100 text-gray-600 transition-all duration-300 hover:bg-red-700 hover:text-white border-2 border-transparent hover:border-red-700">
-              Beachfront
-            </button>
-            <button className="px-4 py-1.5 rounded-full bg-gray-100 text-gray-600 transition-all duration-300 hover:bg-red-700 hover:text-white border-2 border-transparent hover:border-red-700">
-              Downtown
-            </button>
-            <button className="px-4 py-1.5 rounded-full bg-gray-100 text-gray-600 transition-all duration-300 hover:bg-red-700 hover:text-white border-2 border-transparent hover:border-red-700">
-              Investment
-            </button>
-            <button className="px-4 py-1.5 rounded-full bg-gray-100 text-gray-600 transition-all duration-300 hover:bg-red-700 hover:text-white border-2 border-transparent hover:border-red-700">
-              🏡 Family Homes
-            </button>
+          {/* Tags */}
+          <div ref={tagsRef} className="mt-5 flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-slate-700 font-bold mr-1 uppercase tracking-wider">Trending:</span>
+            {['Waterfront', 'Metropolitan', 'Historical', 'Penthouses', 'Eco-Luxury'].map((tag) => (
+              <button key={tag} className="px-3 py-1.5 rounded-md text-slate-700 font-semibold border border-black/10 bg-white/50 backdrop-blur-sm cursor-pointer outline-none">
+                {tag}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <div className="text-3xl font-bold text-red-800">500+</div>
-            <div className="text-sm text-gray-500">Properties</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-red-800">120+</div>
-            <div className="text-sm text-gray-500">Happy Clients</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-red-800">50+</div>
-            <div className="text-sm text-gray-500">Cities</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-red-800">98%</div>
-            <div className="text-sm text-gray-500">Satisfaction</div>
-          </div>
+        {/* Stats Grid */}
+        <div ref={statsRef} className="mt-7 grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { metric: "12,000+", label: "Premium Listings" },
+            { metric: "$4.2B+", label: "Transaction Volume" },
+            { metric: "60+", label: "Countries Connected" },
+            { metric: "99.4%", label: "Vetted Asset Rate" }
+          ].map((stat, i) => (
+            <div key={i} className="text-center bg-white/35 p-4 rounded-xl border border-white/40 shadow-sm backdrop-blur-md">
+              <div className="text-2xl font-extrabold tracking-tight text-blue-700 mb-0.5">{stat.metric}</div>
+              <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{stat.label}</div>
+            </div>
+          ))}
         </div>
+        
       </div>
     </div>
   );
