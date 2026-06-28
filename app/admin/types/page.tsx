@@ -1,11 +1,11 @@
 'use client'
+import { useState } from 'react'
 import AdminSidebar from '@/components/admin/AdminSidebar'
- import { useState } from 'react'
-  const [isOpen, setIsOpen] = useState(true) // डेस्कटॉप के लिए
-  const [isMobileOpen, setIsMobileOpen] = useState(false) // मोबाइल Off-canvas के लिए
-
-export default function AdminTypesPage() {
-  return (
+ // app\admin\types\page.tsx
+ export default function AdminTypesPage() {
+   const [isOpen, setIsOpen] = useState(true) 
+   const [isMobileOpen, setIsMobileOpen] = useState(false) 
+   return (
     <div className="min-h-screen bg-slate-50/60 flex pt-10 w-full">
        {/* साइडबार कंपोनेंट में स्टेट्स पास करना */}
            <AdminSidebar 
