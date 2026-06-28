@@ -3,7 +3,6 @@ import AdminSidebar from '@/components/admin/AdminSidebar'
 import { useState } from 'react'
 
 export default function AdminPropertiesPage() {
-  // हुक्स (Hooks) को हमेशा यहाँ, कंपोनेंट फ़ंक्शन के अंदर होना चाहिए:
   const [isOpen, setIsOpen] = useState(true)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
 

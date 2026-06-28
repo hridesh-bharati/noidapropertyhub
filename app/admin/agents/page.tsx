@@ -1,10 +1,18 @@
 'use client'
+import { useState } from 'react'
 import AdminSidebar from '@/components/admin/AdminSidebar'
-
 export default function AdminAgentsPage() {
+  const [isOpen, setIsOpen] = useState(true) 
+  const [isMobileOpen, setIsMobileOpen] = useState(false) 
   return (
     <div className="min-h-screen bg-slate-50/60 pt-10 flex w-full">
-      <AdminSidebar />
+   <AdminSidebar 
+              isOpen={isOpen} 
+              setIsOpen={setIsOpen} 
+              isMobileOpen={isMobileOpen} 
+              setIsMobileOpen={setIsMobileOpen} 
+            />
+            
       
       <div className="flex-1 pl-24 md:pl-64 w-full px-4 md:px-8 py-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 bg-white p-4 rounded-3xl border border-slate-100/50">
