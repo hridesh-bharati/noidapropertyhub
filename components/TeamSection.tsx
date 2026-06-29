@@ -9,53 +9,42 @@ interface TeamMember {
   image: string;
   name: string;
   designation: string;
+  badge: string;
   social: {
     facebook: string;
-    twitter: string;
     instagram: string;
+    whatsapp: string;
   };
 }
 
 const teamMembers: TeamMember[] = [
   {
-    image: '/img/team-1.jpg',
+    image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=400&auto=format&fit=crop',
     name: 'Vikram Malhotra',
-    designation: 'Senior Advisor / Noida Corridor Specialist',
-    social: {
-      facebook: '#',
-      twitter: '#',
-      instagram: '#',
-    },
+    badge: 'MANAGER',
+    designation: 'Senior Advisor',
+    social: { facebook: '#', instagram: '#', whatsapp: '#' },
   },
   {
-    image: '/img/team-2.jpg',
+    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&auto=format&fit=crop',
     name: 'Aanya Sharma',
-    designation: 'Senior Advisor / Noida Corridor Specialist',
-    social: {
-      facebook: '#',
-      twitter: '#',
-      instagram: '#',
-    },
+    badge: 'CEO',
+    designation: 'Noida Corridor Specialist',
+    social: { facebook: '#', instagram: '#', whatsapp: '#' },
   },
   {
-    image: '/img/team-3.jpg',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop',
     name: 'Rohit Verma',
-    designation: 'Senior Advisor / Noida Corridor Specialist',
-    social: {
-      facebook: '#',
-      twitter: '#',
-      instagram: '#',
-    },
+    badge: 'GENERAL MANAGER',
+    designation: 'General Manager',
+    social: { facebook: '#', instagram: '#', whatsapp: '#' },
   },
   {
-    image: '/img/team-4.jpg',
+    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=400&auto=format&fit=crop',
     name: 'Riya Kapoor',
-    designation: 'Senior Advisor / Noida Corridor Specialist',
-    social: {
-      facebook: '#',
-      twitter: '#',
-      instagram: '#',
-    },
+    badge: 'TEAM LEAD',
+    designation: 'Team Lead',
+    social: { facebook: '#', instagram: '#', whatsapp: '#' },
   },
 ];
 
@@ -70,9 +59,8 @@ export default function TeamSection() {
     if (!containerRef.current) return;
     const q = gsap.utils.selector(containerRef);
 
-    // सेट इनिशियल स्टेट्स
-    gsap.set(q(".animate-header"), { opacity: 0, y: 30 });
-    gsap.set(q(".animate-card"), { opacity: 0, y: 50, scale: 0.95 });
+    gsap.set(q(".animate-header"), { opacity: 0, y: -20 });
+    gsap.set(q(".animate-card"), { opacity: 0, scale: 0.9, y: 30 });
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -82,23 +70,8 @@ export default function TeamSection() {
       }
     });
 
-    // 1. हेडिंग एनिमेशन
-    tl.to(q(".animate-header"), {
-      opacity: 1,
-      y: 0,
-      duration: 0.8,
-      ease: "power3.out"
-    });
-
-    // 2. कार्ड्स का प्रीमियम स्टैगर और स्केल-अप
-    tl.to(q(".animate-card"), {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      duration: 1,
-      stagger: 0.15,
-      ease: "power4.out"
-    }, "-=0.5");
+    tl.to(q(".animate-header"), { opacity: 1, y: 0, duration: 0.6 });
+    tl.to(q(".animate-card"), { opacity: 1, scale: 1, y: 0, duration: 0.8, stagger: 0.15, ease: "back.out(1.2)" }, "-=0.3");
 
     return () => {
       ScrollTrigger.getAll().forEach(t => t.kill());
@@ -106,55 +79,81 @@ export default function TeamSection() {
   }, []);
 
   return (
-    <section ref={containerRef} className="premium-gradient-bg py-24 sm:py-32 overflow-hidden">
+    <section ref={containerRef} className="bg-gradient-to-br from-cyan-50/70 via-white to-emerald-50/60 py-20 overflow-hidden font-sans select-none relative text-gray-800">
+      
+      {/* 1. टॉप राइट कलर्ड सर्कल (Soft Light Blue Blur Orb) */}
+      <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-cyan-200/40 blur-3xl pointer-events-none -z-0" />
+      
+      {/* 2. बॉटम लेफ्ट कलर्ड सर्कल (Soft Light Green Blur Orb) */}
+      <div className="absolute -bottom-20 -left-20 w-96 h-96 rounded-full bg-emerald-200/40 blur-3xl pointer-events-none -z-0" />
+
+      {/* डेकोरेटिव थिन बैकग्राउंड लाइन */}
+      <div className="absolute top-[48%] left-0 w-full h-[1px] bg-gray-200/60 -z-0 pointer-events-none hidden lg:block" />
+
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
         
-        {/* Header Block (image_0.png जैसा सटीक) */}
-        <div className="animate-header text-center mx-auto mb-16 max-w-3xl">
-          <span className="text-[11px] font-bold tracking-[0.3em] text-gray-800 uppercase mb-3 block">
-            Our Premium Hub Agents
-          </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light text-gray-900 tracking-tight leading-tight mb-4">
-            Meet Our <span className="font-serif italic text-pink-600 font-normal">Experienced</span> Property Agents
+        {/* टू-कॉलम हेडर ब्लॉक */}
+        <div className="animate-header flex flex-col lg:flex-row lg:items-start lg:justify-between border-b border-gray-200/60 pb-10 mb-16 gap-4">
+          <h2 className="text-4xl lg:text-5xl font-black text-[#1d4ed8] tracking-tight whitespace-nowrap">
+            Our Team
           </h2>
-          <div className="w-12 h-[1px] bg-pink-600/30 mx-auto my-5" />
-          <p className="text-sm text-gray-600 font-normal leading-relaxed max-w-2xl mx-auto">
-            Our dedicated specialists in NoidaHub are committed to guiding you towards your ideal corporate space and residential nodes within India's dynamic corridors. Connect with our expert advisors.
+          <p className="text-gray-500 text-sm max-w-xl lg:text-right leading-relaxed font-medium pt-2">
+            Our dedicated team brings together expertise and passion to deliver the best real estate solutions. This is sample text. Insert your desired text here.
           </p>
         </div>
         
-        {/* Team Grid Layout (image_0.png जैसा सटीक) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* टीम ग्रिड */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
           {teamMembers.map((member, index) => (
-            <div key={index} className="animate-card team-item rounded-none overflow-hidden group">
-              <div className="relative">
-                <img 
-                  className="w-full h-80 object-cover rounded-none transition-transform duration-500 group-hover:scale-105" 
-                  src={member.image} 
-                  alt={member.name}
-                />
+            <div key={index} className="animate-card flex flex-col items-center text-center group">
+              
+              {/* इमेज कंटेनर विथ आर्क डिज़ाइन */}
+              <div className="relative w-56 h-56 flex items-center justify-center mb-6">
                 
-                {/* प्रीमियम सोशल मीडिया आइकन कंटेनर */}
-                <div className="absolute right-4 bottom-4 flex flex-col space-y-1.5 transform translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-out z-20">
-                  <Link href={member.social.facebook} className="bg-white/90 backdrop-blur-sm text-pink-600 w-10 h-10 flex items-center justify-center rounded-full hover:bg-pink-600 hover:text-white transition-all shadow-md">
-                    <i className="fab fa-facebook-f text-lg"></i>
-                  </Link>
-                  <Link href={member.social.twitter} className="bg-white/90 backdrop-blur-sm text-blue-600 w-10 h-10 flex items-center justify-center rounded-full hover:bg-blue-600 hover:text-white transition-all shadow-md">
-                    <i className="fab fa-twitter text-lg"></i>
-                  </Link>
-                  <Link href={member.social.instagram} className="bg-white/90 backdrop-blur-sm text-gray-900 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-900 hover:text-white transition-all shadow-md">
-                    <i className="fab fa-instagram text-lg"></i>
-                  </Link>
+                {/* आउटर ग्रेडिएंट आर्क */}
+                <div className="absolute inset-0 rounded-full border-[3px] border-transparent bg-gradient-to-tr from-[#1d4ed8] via-[#ec4899] to-[#10b981] [mask-image:linear-gradient(white,white)] -z-10 opacity-90 group-hover:rotate-45 transition-transform duration-700" />
+                
+                {/* मुख्य सर्कुलर इमेज */}
+                <div className="w-[88%] h-[88%] rounded-full overflow-hidden border-4 border-white shadow-lg relative">
+                  <img 
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                    src={member.image} 
+                    alt={member.name}
+                  />
                 </div>
-
-                {/* इमेज पर हल्का ओवरले */}
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-950/20 via-transparent to-transparent pointer-events-none rounded-none" />
               </div>
               
-              <div className="text-center p-6 border border-gray-200 border-t-0 bg-white rounded-none">
-                <h5 className="font-semibold mb-0.5 text-lg text-gray-900 tracking-tight">{member.name}</h5>
-                <small className="text-gray-600 text-sm font-normal block">{member.designation}</small>
+              {/* कैप्सूल शेप्ड डेसिग्नेशन बैच */}
+              <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold text-[11px] px-6 py-1.5 rounded-full shadow-sm tracking-widest min-w-[130px] uppercase mb-3">
+                {member.badge}
               </div>
+
+              {/* नाम और छोटा सबटाइटल */}
+              <h5 className="font-bold text-xl text-gray-900 tracking-tight mb-0.5">
+                {member.name}
+              </h5>
+              <p className="text-gray-500 text-xs font-semibold tracking-wider uppercase mb-4">
+                {member.designation}
+              </p>
+
+              {/* कलरफुल सोशल मीडिया आइकन्स - बॉटम कैप्सूल स्टाइल (हमेशा डिफ़ॉल्ट शो) */}
+              <div className="bg-white/90 backdrop-blur-xs px-4 py-1.5 rounded-full flex items-center justify-center space-x-4 shadow-md border border-gray-100">
+                {/* Facebook */}
+                <Link href={member.social.facebook} className="text-[#1877F2] hover:scale-115 transition-transform flex items-center justify-center">
+                  <i className="bi bi-facebook text-lg"></i>
+                </Link>
+                
+                {/* Instagram Gradient */}
+                <Link href={member.social.instagram} className="hover:scale-115 transition-transform flex items-center justify-center bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] bg-clip-text text-transparent">
+                  <i className="bi bi-instagram text-lg font-bold"></i>
+                </Link>
+                
+                {/* WhatsApp */}
+                <Link href={member.social.whatsapp} className="text-[#25D366] hover:scale-115 transition-transform flex items-center justify-center">
+                  <i className="bi bi-whatsapp text-lg"></i>
+                </Link>
+              </div>
+
             </div>
           ))}
         </div>

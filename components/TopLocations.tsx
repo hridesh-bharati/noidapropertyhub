@@ -1,4 +1,5 @@
 'use client'
+
 import Link from 'next/link'
 import { useRef, useEffect } from 'react'
 import { gsap } from 'gsap'
@@ -62,14 +63,14 @@ export default function TopLocations() {
     const cards = cardsRef.current.filter(Boolean)
 
     gsap.fromTo(cards,
-      { opacity: 0, y: 60, scale: 0.95 },
+      { opacity: 0, y: 40, scale: 0.97 },
       {
         opacity: 1,
         y: 0,
         scale: 1,
-        duration: 0.9,
+        duration: 0.8,
         stagger: 0.12,
-        ease: 'power4.out',
+        ease: 'power3.out',
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top 75%",
@@ -84,104 +85,96 @@ export default function TopLocations() {
   }, [])
 
   return (
-    <section className="w-full bg-gradient-to-b from-white via-slate-50/50 to-white py-16 sm:py-24 relative overflow-hidden">
-      {/* बैकग्राउंड डेकोरेशन */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+    <section className="w-full bg-white py-20 sm:py-24 relative overflow-hidden font-sans select-none text-slate-800">
       
-      <div ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* सिर्फ बीच में चमकने वाला सॉफ्ट रेडियल ग्रेडिएंट (Cyan + Emerald Light Theme Sync) */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.12)_0%,rgba(52,211,153,0.06)_45%,transparent_70%)] pointer-events-none z-0" />
+
+      {/* टॉप और बॉटम थिन लक्ज़री डिवाइडर लाइन्स */}
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+      
+      <div ref={containerRef} className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
         
-        {/* उप-शीर्षक (Sub-header) - प्रीमियम बैज */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 mb-3">
-          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-          <p className="text-[10px] font-black tracking-[0.2em] text-primary uppercase">
+        {/* उप-शीर्षक - प्रीमियम ऐप बैज */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-white border border-[#2563EB]/15 rounded-full mb-4 shadow-sm backdrop-blur-md">
+          <span className="w-1.5 h-1.5 bg-[#2563EB] rounded-full animate-pulse" />
+          <p className="text-[10px] font-bold tracking-[0.2em] text-[#2563EB] uppercase">
             Prime Locations
           </p>
         </div>
         
         {/* मुख्य शीर्षक */}
-        <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
-          Discover <span className="text-primary">Top</span> Office Hubs
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-3 leading-tight">
+          Discover <span className="font-serif italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-[#2563EB] via-[#1d4ed8] to-[#06B6D4]">Top Office Hubs</span>
         </h2>
         
-        {/* शीर्षक के नीचे प्रीमियम लाइन */}
-        <div className="flex items-center justify-center gap-3 mt-4">
-          <div className="w-8 h-0.5 bg-primary/40 rounded-full" />
-          <div className="w-12 h-0.5 bg-primary rounded-full" />
-          <div className="w-8 h-0.5 bg-primary/40 rounded-full" />
-        </div>
-        
         {/* विवरण */}
-        <p className="max-w-2xl mx-auto text-sm sm:text-base text-slate-500 font-medium leading-relaxed mt-5 tracking-wide px-2">
-          Premium office spaces across Delhi NCR's most active business corridors — 
-          curated for discerning occupiers seeking <span className="text-primary font-bold">excellence</span>.
+        <p className="max-w-xl mx-auto text-xs sm:text-sm text-slate-500 font-medium leading-relaxed tracking-wide mb-14">
+          Premium office spaces across Delhi NCR's most active business corridors — curated with highest standards of corporate excellence.
         </p>
 
-        {/* ग्रिड कंटेनर - प्रीमियम कार्ड्स */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 sm:mt-16">
+        {/* ग्रिड कंटेनर - 24px रेडियस और लक्ज़री होवर इफेक्ट्स */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {locations.map((loc, idx) => (
             <Link
               key={idx}
               ref={el => { cardsRef.current[idx] = el }}
               href={loc.href}
-              className="group relative h-[320px] w-full rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-700 bg-slate-900 block"
+              className="group relative h-[340px] w-full rounded-3xl overflow-hidden shadow-sm hover:shadow-[0_20px_40px_rgba(15,23,42,0.12)] transition-all duration-700 bg-slate-900 block border border-slate-100"
             >
-              {/* बैकग्राउंड इमेज */}
+              {/* बैकग्राउंड इमेज विथ स्मूथ स्लो-जूम */}
               <div 
-                className="absolute inset-0 bg-cover bg-center scale-110 group-hover:scale-125 transition-transform duration-[800ms] ease-out"
+                className="absolute inset-0 bg-cover bg-center scale-102 group-hover:scale-108 transition-transform duration-[1000ms] ease-out"
                 style={{ backgroundImage: `url(${loc.image})` }}
               />
 
-              {/* ड्यूल ओवरले - प्रीमियम ग्रेडिएंट */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/60 to-slate-950/20 opacity-90 group-hover:opacity-95 transition-opacity duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              {/* सिनेमैटिक ग्रेडिएंट ओवरले */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent opacity-85 group-hover:opacity-90 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#2563EB]/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-              {/* टॉप-राइट बैज */}
-              <div className="absolute top-4 right-4 bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full">
-                <p className="text-[9px] font-black text-white/90 uppercase tracking-wider flex items-center gap-1.5">
-                  <i className={`bi ${loc.icon} text-primary text-[10px]`}></i>
+              {/* टॉप-राइट फ्लोटिंग बैज */}
+              <div className="absolute top-4 right-4 bg-slate-950/60 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-xl shadow-sm">
+                <p className="text-[10px] font-bold text-white flex items-center gap-1.5">
+                  <i className={`bi ${loc.icon} text-[#06B6D4]`}></i>
                   {loc.stats}
                 </p>
               </div>
 
-              {/* बॉटम कंटेंट */}
-              <div className="absolute bottom-0 left-0 w-full p-6 text-left">
-                {/* होवर इंडिकेटर लाइन */}
-                <div className="w-8 h-0.5 bg-primary rounded-full mb-3 group-hover:w-16 transition-all duration-500" />
+              {/* बॉटम टेक्स्ट एरिया */}
+              <div className="absolute bottom-0 left-0 w-full p-6 text-left z-10">
+                {/* होवर एनिमेटेड अंडरलाइन */}
+                <div className="w-6 h-[2px] bg-[#06B6D4] rounded-full mb-3 group-hover:w-14 transition-all duration-500 ease-out" />
                 
-                <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight group-hover:text-primary transition-colors duration-300">
+                <h3 className="text-xl font-extrabold text-white tracking-tight group-hover:text-[#06B6D4] transition-colors duration-300">
                   {loc.city}
                 </h3>
                 
-                <p className="text-sm text-slate-300 font-medium mt-1 tracking-wide opacity-80 group-hover:opacity-100 transition-opacity">
+                <p className="text-xs text-slate-300 font-semibold mt-1 tracking-wide opacity-80 group-hover:opacity-100 transition-opacity">
                   {loc.tagline}
                 </p>
 
-                {/* एरो इंडिकेटर */}
-                <div className="flex items-center gap-2 mt-4 opacity-0 group-hover:opacity-100 translate-x-[-10px] group-hover:translate-x-0 transition-all duration-500">
-                  <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Explore</span>
-                  <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
+                {/* नेटिव ऐप स्टाइल 'Explore' बटन स्लाइडर */}
+                <div className="flex items-center gap-1.5 mt-4 opacity-0 group-hover:opacity-100 -translate-x-3 group-hover:translate-x-0 transition-all duration-500 ease-out">
+                  <span className="text-[10px] font-bold text-[#06B6D4] uppercase tracking-widest">Explore Node</span>
+                  <i className="bi bi-arrow-right text-[#06B6D4] text-xs"></i>
                 </div>
               </div>
 
-              {/* बॉर्डर ग्लो इफेक्ट */}
-              <div className="absolute inset-0 rounded-2xl border-2 border-white/0 group-hover:border-primary/30 transition-colors duration-500 pointer-events-none" />
+              {/* इनर बॉर्डर ग्लो */}
+              <div className="absolute inset-0 rounded-3xl border border-white/0 group-hover:border-[#2563EB]/20 transition-colors duration-500 pointer-events-none" />
             </Link>
           ))}
         </div>
 
-        {/* बॉटम सीटीए */}
-        <div className="mt-12">
+        {/* बॉटम सीटीए - लक्ज़री ग्रेडिएंट बटन */}
+        <div className="mt-14">
           <Link
             href="/property"
-            className="inline-flex items-center gap-3 px-8 py-3.5 bg-slate-950 hover:bg-primary text-white font-bold rounded-full text-xs uppercase tracking-widest transition-all duration-300 shadow-lg hover:shadow-primary/25 group"
+            className="inline-flex items-center justify-center gap-2 text-xs font-bold tracking-wider text-white bg-gradient-to-r from-[#2563EB] to-[#06B6D4] h-12 px-8 rounded-xl shadow-md shadow-blue-500/5 hover:brightness-105 hover:-translate-y-0.5 transition-all duration-200 uppercase group"
           >
             View All Locations
-            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+            <i className="bi bi-arrow-right group-hover:translate-x-1 transition-transform"></i>
           </Link>
         </div>
 
