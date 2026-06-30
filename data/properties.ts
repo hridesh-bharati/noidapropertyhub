@@ -28,12 +28,48 @@ export interface Property {
     floorPlate?: string
 }
 
-// All sectors from your list - ONLY THESE
+// All sectors from your list - ONLY THESE 20
 const sectors = [
     'Sector 140A', 'Sector 4', 'Sector 57', 'Sector 58', 'Sector 59',
     'Sector 63', 'Sector 65', 'Sector 67', 'Sector 80', 'Sector 83',
     'Hosiery Complex', 'Phase 2', 'Sector 138', 'Sector 85', 'Sector 140',
     'Sector 155', 'Ecotech 3', 'Sector 8', 'Sector 6', 'Sector 5'
+];
+
+// Warehouse feature sets
+const warehouseFeatures = [
+    ['Loading Dock', '24/7 Security', 'Power Backup', 'Fire Safety', 'Fleet Parking', 'CCTV Surveillance'],
+    ['Cold Storage', 'Loading Bay', 'Temperature Control', 'Security', 'Power Backup', 'Inventory Area'],
+    ['Multiple Docks', 'Warehouse Office', 'Staff Canteen', 'Security System', 'Generator Backup', 'Sprinkler System'],
+    ['Ground Level Access', 'Heavy Vehicle Access', '24/7 Power', 'Security Guard', 'Parking Area', 'Washroom'],
+    ['High Ceiling', 'Racking System', 'Forklift Access', 'Fire Alarm', 'CCTV', 'Staff Room']
+];
+
+// Factory feature sets
+const factoryFeatures = [
+    ['Production Line', 'Assembly Area', 'Quality Control Lab', 'Staff Quarters', 'Power Backup', 'Fire Safety'],
+    ['Heavy Machinery Area', 'Raw Material Store', 'Finished Goods Area', 'Canteen', 'Security', 'Generator'],
+    ['Manufacturing Unit', 'Tool Room', 'Inspection Area', 'Worker Facilities', 'Power Backup', 'Loading Bay'],
+    ['Processing Plant', 'Storage Shed', 'Packaging Unit', 'Staff Canteen', '24/7 Power', 'Safety Equipment'],
+    ['Industrial Unit', 'Machine Floor', 'Utility Area', 'Office Block', 'Fire System', 'Backup Power']
+];
+
+// Warehouse titles
+const warehouseTitles = [
+    'Premium Warehouse Space',
+    'Modern Storage Warehouse',
+    'Large Distribution Warehouse',
+    'Industrial Warehouse Unit',
+    'Smart Logistics Warehouse'
+];
+
+// Factory titles
+const factoryTitles = [
+    'Industrial Factory Unit',
+    'Manufacturing Factory Space',
+    'Production Factory Complex',
+    'Heavy Industrial Factory',
+    'Light Manufacturing Factory'
 ];
 
 // Real properties from estate lion
@@ -46,7 +82,7 @@ export const allProperties: Property[] = [
         price: '₹120 Cr',
         title: '112,500 sq.ft. IT/ITeS Office Building for Rent – Sector 135, Noida',
         location: 'Sector-135 Noida, Noida',
-        sqft: 'Area on request',
+        sqft: '112,500 Sq.Ft',
         features: [
             'IT/ITeS Building',
             '2 Basement Levels',
@@ -54,19 +90,8 @@ export const allProperties: Property[] = [
             '12,500 sq.ft. Typical Floor Plate',
             'Noida-Greater Noida Expressway',
             'Sector 142 Metro Station',
-            'Noida International Airport',
-            '1:1000 sq.ft. Parking Ratio',
-            'Visitor Parking',
-            'Maintenance Staff',
-            'Waste Disposal',
-            'Waiting Lounge',
-            'Service/Goods Lift',
-            'Water Storage',
             'Power Back-Up',
-            '24x7 Security',
-            'Reserved Parking',
-            'East Facing',
-            'Split Air-Conditioning'
+            '24x7 Security'
         ],
         featured: true,
         verified: true,
@@ -75,182 +100,78 @@ export const allProperties: Property[] = [
         typicalFloor: '12,500 sq.ft.',
         floors: '2B + GF + 8 Floors',
         plotArea: '4,000 sq.m',
-        certification: 'On request',
-        builtUpArea: '112,500 sq.ft.',
-        floorPlate: '12,500 sq.ft.',
-        description: `A standalone commercial office building is available for Rent in Sector 135, Noida, offering an excellent opportunity for investors, corporate occupiers, IT/ITeS companies, business headquarters, and institutional buyers seeking ownership of a large commercial asset in one of Noida's established IT and commercial corridors.
-
-Developed on a 4,000 sq.m plot, the property offers a total built-up area of approximately 112,500 sq.ft and is configured as 2 Basement Levels, Ground Floor and 8 Upper Office Floors. The building features large floor plates of approximately 12,500 sq.ft, providing flexible layouts suitable for corporate headquarters, IT/ITeS operations, business centres, training facilities, and institutional use. The efficient design allows for open workstations, executive cabins, conference rooms, collaboration areas, and other business functions.
-
-As an independent commercial building, the property offers enhanced visibility, controlled access, operational flexibility, and excellent branding opportunities. Its spacious floor plates and efficient planning ensure optimal space utilization while supporting the evolving requirements of modern businesses.
-
-Strategically located in Sector 135, Noida, the property enjoys excellent connectivity via the Noida-Greater Noida Expressway, providing seamless access to key commercial hubs across Noida, Greater Noida, Delhi, and the wider NCR region. Sector 142 Metro Station (Aqua Line) is located nearby, offering convenient public transportation for employees and visitors. The property also provides easy access to Indira Gandhi International Airport and Noida International Airport, making it an ideal choice for organizations with frequent domestic and international business travel.
-
-Surrounded by established corporate campuses, business parks, residential developments, and supporting social infrastructure, this standalone commercial office building presents an outstanding opportunity for long-term investment, corporate ownership, and business expansion in one of Noida's most prominent commercial destinations.`,
+        description: 'A standalone commercial office building available for Rent in Sector 135, Noida.',
         nearby: {
             metro: [
-                { name: 'Sector 142', distance: '11 mins (1.5 km)' },
-                { name: 'Sector 137', distance: '9 mins (1.5 km)' },
-                { name: 'Sector 143', distance: '24 mins' },
-                { name: 'Sector 83', distance: '27 km' }
+                { name: 'Sector 142', distance: '11 mins (1.5 km)' }
             ],
             airport: 'Noida International Airport - Easy Access',
-            expressway: 'Noida-Greater Noida Expressway'
-        }
-    },
-    {
-        id: 2,
-        image: '/img/property-2.jpg',
-        type: 'For Rent',
-        category: 'Warehouse',
-        price: '₹65 Cr',
-        title: '25,000 sq.ft Warehouse for Rent in Sector 67, Noida',
-        location: 'Sector-67 Noida, Noida',
-        sqft: 'Area on request',
-        features: ['Warehouse', 'Loading Dock', '24/7 Security', 'Power Backup', 'Fleet Parking', 'Office Block'],
-        featured: true,
-        verified: true,
-        availability: 'Available Now',
-        advisor: 'Priya Sharma',
-        description: 'A premium warehouse space available for Rent in Sector 67, Noida. This well-maintained property offers excellent storage and logistics capabilities in Noida\'s prime industrial corridor.',
-        nearby: {
-            metro: [
-                { name: 'Sector 67 Metro Station', distance: '8 mins (1.2 km)' }
-            ],
-            airport: 'Indira Gandhi International Airport - 40 mins',
-            expressway: 'Noida-Greater Noida Expressway'
-        }
-    },
-    {
-        id: 3,
-        image: '/img/property-3.jpg',
-        type: 'For Rent',
-        category: 'Commercial Building',
-        price: '₹120 Cr',
-        title: 'Premium Rented Commercial Asset for Rent – Sector 142, Noida',
-        location: 'Sector-142 Noida, Noida',
-        sqft: 'Area on request',
-        features: ['Commercial Building', 'Visitor Parking', 'Maintenance Staff', 'Waste Disposal', 'Waiting Lounge', 'Service/Goods Lift', 'Water Storage', 'Power Back-Up', '24x7 Security'],
-        featured: true,
-        verified: true,
-        availability: 'Available Now',
-        advisor: 'Rahul Verma',
-        description: 'A premium commercial asset with existing rental income available for Rent in Sector 142, Noida. This property offers excellent investment potential in one of Noida\'s most sought-after commercial corridors.',
-        nearby: {
-            metro: [
-                { name: 'Sector 142 Metro Station', distance: '5 mins (0.8 km)' }
-            ],
-            airport: 'Noida International Airport - 35 mins',
-            expressway: 'Noida-Greater Noida Expressway'
-        }
-    },
-    {
-        id: 4,
-        image: '/img/property-4.jpg',
-        type: 'For Rent',
-        category: 'Commercial Building',
-        price: '₹45 Cr',
-        title: 'Commercial Office Building for Rent – Sector 136, Noida',
-        location: 'Sector-136 Noida, Noida',
-        sqft: 'Area on request',
-        features: ['Commercial Building', 'Office Space', 'Parking', 'Security System', 'Power Backup', 'Elevators'],
-        featured: false,
-        verified: true,
-        availability: 'Available Now',
-        advisor: 'Sneha Patel',
-        description: 'A well-located commercial office building available for Rent in Sector 136, Noida. This property offers excellent visibility and accessibility in Noida\'s growing commercial hub.',
-        nearby: {
-            metro: [
-                { name: 'Sector 136 Metro Station', distance: '10 mins (1.8 km)' }
-            ],
-            airport: 'Indira Gandhi International Airport - 45 mins',
-            expressway: 'Noida-Greater Noida Expressway'
-        }
-    },
-    {
-        id: 5,
-        image: '/img/property-5.jpg',
-        type: 'For Rent',
-        category: 'Commercial Building',
-        price: '₹100 Cr',
-        title: 'Premium IT/ITeS Office Building for Rent – Sector 136, Noida',
-        location: 'Sector-136 Noida, Noida',
-        sqft: 'Area on request',
-        features: ['IT/ITeS Building', 'Data Centers', 'Server Rooms', 'Conference Rooms', 'Meeting Rooms', 'Cafeteria', 'High Speed Internet', 'Backup Generator'],
-        featured: true,
-        verified: true,
-        availability: 'Available Now',
-        advisor: 'Ashutosh Tripathi',
-        description: 'A premium IT/ITeS office building available for Rent in Sector 136, Noida. This property is designed to meet the requirements of modern technology and business processing companies.',
-        nearby: {
-            metro: [
-                { name: 'Sector 136 Metro Station', distance: '10 mins (1.8 km)' }
-            ],
-            airport: 'Noida International Airport - 30 mins',
             expressway: 'Noida-Greater Noida Expressway'
         }
     }
 ];
 
-// Generate properties for all sectors
+// Generate ONLY Warehouse and Factory properties for ALL 20 sectors
 sectors.forEach((sector, index) => {
-    const exists = allProperties.some(p => p.location.includes(sector));
-    if (!exists) {
-        const categories = ['Warehouse', 'Factory', 'Commercial Building', 'Industrial Shed', 'Office Space'];
-        const cat = categories[index % categories.length];
-        const sqftOptions = ['15,000 Sqft', '25,000 Sqft', '35,000 Sqft', '50,000 Sqft', '75,000 Sqft', '100,000 Sqft'];
-        const sqft = sqftOptions[index % sqftOptions.length];
-        const priceOptions = ['₹45 Cr', '₹65 Cr', '₹80 Cr', '₹100 Cr', '₹120 Cr', '₹150 Cr'];
-        const price = priceOptions[index % priceOptions.length];
-        const typeOptions = ['For Rent', 'For Rent', 'For Lease'];
-        const type = typeOptions[index % typeOptions.length];
-        const availabilityOptions = ['Available Now', 'Available from Next Month', 'Coming Soon'];
-        const availability = availabilityOptions[index % availabilityOptions.length];
-        const advisorNames = ['Ashutosh Tripathi', 'Priya Sharma', 'Rahul Verma', 'Sneha Patel'];
-        const advisor = advisorNames[index % advisorNames.length];
-        const featureSets = {
-            'Warehouse': ['Loading Dock', '24/7 Security', 'Power Backup', 'Fleet Parking', 'Office Block', 'Storage', 'Loading Area'],
-            'Factory': ['Production Line', 'Staff Quarters', 'Canteen', 'Assembly Line', 'Office Space', 'Parking', 'Heavy Machinery'],
-            'Commercial Building': ['Visitor Parking', 'Maintenance Staff', 'Waste Disposal', 'Waiting Lounge', 'Service/Goods Lift', 'Water Storage', 'Power Back-Up'],
-            'Industrial Shed': ['Large Floor Space', 'Ventilation', 'Crane Facility', 'Material Storage', 'Security System', 'Fire Safety'],
-            'Office Space': ['Conference Rooms', 'Meeting Rooms', 'Cafeteria', 'High Speed Internet', 'Backup Generator', 'Parking']
-        };
-        const features = featureSets[cat as keyof typeof featureSets] || ['24/7 Security', 'Power Backup', 'Parking'];
-        const selectedFeatures = features.slice(0, 4 + (index % 3));
-        const prefixes = {
-            'Warehouse': ['Premium Warehouse', 'Modern Warehouse', 'Massive Distribution', 'Smart Warehouse'],
-            'Factory': ['Industrial Factory', 'Light Manufacturing', 'Heavy Industrial', 'Production Unit'],
-            'Commercial Building': ['Commercial Building', 'Office Complex', 'Corporate Tower', 'Business Center'],
-            'Industrial Shed': ['Industrial Shed', 'Factory Shed', 'Warehouse Shed', 'Manufacturing Shed'],
-            'Office Space': ['Premium Office', 'Corporate Office', 'Business Space', 'Executive Office']
-        };
-        const prefixList = prefixes[cat as keyof typeof prefixes] || ['Commercial Space'];
-        const prefix = prefixList[index % prefixList.length];
-        
-        allProperties.push({
-            id: allProperties.length + 1,
-            image: `/img/property-${(index % 5) + 1}.jpg`,
-            type: type,
-            category: cat,
-            price: price,
-            title: `${prefix} in ${sector}, Noida`,
-            location: `${sector}, Noida`,
-            sqft: sqft,
-            features: selectedFeatures,
-            featured: index % 3 === 0,
-            verified: true,
-            availability: availability,
-            advisor: advisor,
-            description: `A premium ${cat.toLowerCase()} space located in ${sector}, Noida. This well-maintained property offers ${sqft} of built-up area with modern amenities and excellent connectivity. Perfect for businesses seeking quality industrial/commercial space in Noida's prime location.`,
-            nearby: {
-                metro: [
-                    { name: `${sector} Metro Station`, distance: `${5 + (index % 10)} mins (${0.8 + (index % 3)} km)` }
-                ],
-                airport: index % 2 === 0 ? 'Noida International Airport - Easy Access' : 'Indira Gandhi International Airport - 45 mins',
-                expressway: index % 2 === 0 ? 'Noida-Greater Noida Expressway' : 'DND Flyway'
-            }
-        });
-    }
+    // Generate Warehouse property for each sector
+    const warehouseTitleIndex = index % warehouseTitles.length;
+    const warehouseFeatureIndex = index % warehouseFeatures.length;
+    const warehouseSqftOptions = ['8,000', '12,000', '15,000', '20,000', '25,000', '30,000', '35,000', '40,000', '45,000', '50,000'];
+    const warehousePriceOptions = ['₹1.8 Cr', '₹2.2 Cr', '₹2.8 Cr', '₹3.5 Cr', '₹4.2 Cr', '₹5.0 Cr', '₹5.8 Cr', '₹6.5 Cr', '₹7.5 Cr', '₹8.5 Cr'];
+    
+    allProperties.push({
+        id: allProperties.length + 1,
+        image: `/img/property-${(index % 5) + 1}.jpg`,
+        type: 'For Rent',
+        category: 'Warehouse',
+        price: warehousePriceOptions[index % warehousePriceOptions.length],
+        title: `${warehouseTitles[warehouseTitleIndex]} for Rent in ${sector}, Noida`,
+        location: `${sector}, Noida`,
+        sqft: `${warehouseSqftOptions[index % warehouseSqftOptions.length]} Sq.Ft`,
+        features: warehouseFeatures[warehouseFeatureIndex],
+        featured: index % 5 === 0,
+        verified: true,
+        availability: 'Available Now',
+        advisor: ['Ashutosh Tripathi', 'Priya Sharma', 'Rahul Verma', 'Sneha Patel'][index % 4],
+        description: `Premium warehouse space available for Rent in ${sector}, Noida. This well-maintained property offers excellent storage and logistics capabilities with modern amenities, loading facilities, and 24/7 security. Perfect for e-commerce, logistics, and distribution businesses looking for quality industrial space in Noida's prime location.`,
+        nearby: {
+            metro: [
+                { name: `${sector} Metro Station`, distance: `${5 + (index % 10)} mins (${0.8 + (index % 3)} km)` }
+            ],
+            airport: 'Noida International Airport - Easy Access',
+            expressway: 'Noida-Greater Noida Expressway'
+        }
+    });
+
+    // Generate Factory property for each sector
+    const factoryTitleIndex = index % factoryTitles.length;
+    const factoryFeatureIndex = index % factoryFeatures.length;
+    const factorySqftOptions = ['15,000', '20,000', '25,000', '30,000', '35,000', '40,000', '45,000', '50,000', '55,000', '60,000'];
+    const factoryPriceOptions = ['₹3.5 Cr', '₹4.5 Cr', '₹5.5 Cr', '₹6.5 Cr', '₹7.5 Cr', '₹8.5 Cr', '₹9.5 Cr', '₹10.5 Cr', '₹11.5 Cr', '₹12.5 Cr'];
+    
+    allProperties.push({
+        id: allProperties.length + 1,
+        image: `/img/property-${(index % 5) + 1}.jpg`,
+        type: 'For Rent',
+        category: 'Factory',
+        price: factoryPriceOptions[index % factoryPriceOptions.length],
+        title: `${factoryTitles[factoryTitleIndex]} for Rent in ${sector}, Noida`,
+        location: `${sector}, Noida`,
+        sqft: `${factorySqftOptions[index % factorySqftOptions.length]} Sq.Ft`,
+        features: factoryFeatures[factoryFeatureIndex],
+        featured: index % 4 === 0,
+        verified: true,
+        availability: 'Available Now',
+        advisor: ['Rahul Verma', 'Sneha Patel', 'Ashutosh Tripathi', 'Priya Sharma'][index % 4],
+        description: `Premium factory space available for Rent in ${sector}, Noida. This well-equipped industrial unit offers production-ready infrastructure with modern amenities, power backup, staff facilities, and excellent connectivity. Ideal for manufacturing, processing, and industrial operations in Noida's thriving industrial corridor.`,
+        nearby: {
+            metro: [
+                { name: `${sector} Metro Station`, distance: `${5 + (index % 10)} mins (${0.8 + (index % 3)} km)` }
+            ],
+            airport: 'Noida International Airport - Easy Access',
+            expressway: 'Noida-Greater Noida Expressway'
+        }
+    });
 });
 
 // Helper functions
@@ -260,7 +181,7 @@ export function getPropertiesBySector(sector: string): Property[] {
 
 export const allSectors = sectors;
 
-export const categories = ['Warehouse', 'Factory', 'Commercial Building', 'IT/ITeS Building', 'Industrial Shed', 'Office Space'];
+export const categories = ['All', 'Warehouse', 'Factory', 'Commercial Building', 'IT/ITeS Building', 'Industrial Shed'];
 
 export function getRelatedProperties(propertyId: number, limit: number = 4): Property[] {
     const property = allProperties.find(p => p.id === propertyId);

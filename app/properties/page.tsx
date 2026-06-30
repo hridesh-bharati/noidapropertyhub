@@ -1,9 +1,9 @@
 // app/properties/page.tsx
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useEffect, useState, useRef, useMemo } from 'react'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
 import Link from 'next/link'
 import { allProperties } from '../../data/properties'
 
@@ -24,7 +24,7 @@ const filterLocations = [
 ];
 
 // All categories - FIXED order
-const allCategories = ['All', 'Warehouse', 'Factory', 'Commercial Building', 'IT/ITeS Building', 'Industrial Shed'];
+const allCategories = ['All', 'Warehouse', 'Factory'];
 
 function getFeatureIconClass(feature: string): string {
     const f = feature.toLowerCase();
@@ -55,13 +55,6 @@ function getFeatureIconClass(feature: string): string {
 }
 
 export default function AllPropertiesPage() {
-    const pageRef = useRef<HTMLDivElement>(null)
-    const sidebarRef = useRef<HTMLDivElement>(null)
-    const mobileDrawerRef = useRef<HTMLDivElement>(null)
-    const mobileOverlayRef = useRef<HTMLDivElement>(null)
-    const mainContentRef = useRef<HTMLDivElement>(null)
-    const gridRef = useRef<HTMLDivElement>(null)
-    const heroRef = useRef<HTMLDivElement>(null)
     const scrollContainerRef = useRef<HTMLDivElement>(null)
 
     // Filter states
@@ -74,36 +67,52 @@ export default function AllPropertiesPage() {
     const [categoryFilter, setCategoryFilter] = useState<string>('All')
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
-    // Filtered properties
-    const filteredProperties = allProperties.filter(property => {
-        // Location filter
-        if (selectedLocations.length > 0 && !selectedLocations.some(loc =>
-            property.location.includes(loc)
-        )) {
-            return false
-        }
+    // Filtered properties - MUST be before any useEffect that uses it
+    const filteredProperties = useMemo(() => {
+        return allProperties.filter(property => {
+            if (selectedLocations.length > 0 && !selectedLocations.some(loc =>
+                property.location.includes(loc)
+            )) {
+                return false
+            }
 
-        // Search filter
-        if (searchQuery && !property.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-            !property.location.toLowerCase().includes(searchQuery.toLowerCase()) &&
-            !property.category.toLowerCase().includes(searchQuery.toLowerCase())) {
-            return false
-        }
+            if (searchQuery && !property.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+                !property.location.toLowerCase().includes(searchQuery.toLowerCase()) &&
+                !property.category.toLowerCase().includes(searchQuery.toLowerCase())) {
+                return false
+            }
 
-        // Category filter
-        if (categoryFilter !== 'All' && property.category !== categoryFilter) {
-            return false
-        }
+            if (categoryFilter !== 'All' && property.category !== categoryFilter) {
+                return false
+            }
 
-        // Budget filter
-        if (budgetMin || budgetMax) {
-            const priceNum = parseInt(property.price.replace(/[^0-9]/g, ''))
-            if (budgetMin && priceNum < parseInt(budgetMin)) return false
-            if (budgetMax && priceNum > parseInt(budgetMax)) return false
-        }
+            if (budgetMin || budgetMax) {
+                const priceNum = parseInt(property.price.replace(/[^0-9]/g, ''))
+                if (budgetMin && priceNum < parseInt(budgetMin)) return false
+                if (budgetMax && priceNum > parseInt(budgetMax)) return false
+            }
 
-        return true
-    })
+            return true
+        })
+    }, [selectedLocations, searchQuery, categoryFilter, budgetMin, budgetMax])
+
+    // Initialize AOS
+    useEffect(() => {
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: false,
+            offset: 50,
+            delay: 0,
+        })
+    }, [])
+
+    // Refresh AOS when filters or view mode change
+    useEffect(() => {
+        setTimeout(() => {
+            AOS.refresh()
+        }, 100)
+    }, [filteredProperties, viewMode])
 
     const toggleLocation = (location: string) => {
         if (location === 'Noida') {
@@ -128,40 +137,8 @@ export default function AllPropertiesPage() {
     }
 
     const toggleMobileDrawer = (open: boolean) => {
-        if (open) {
-            setIsMobileFilterOpen(true)
-            document.body.style.overflow = 'hidden'
-            gsap.killTweensOf([mobileDrawerRef.current, mobileOverlayRef.current])
-
-            gsap.set(mobileOverlayRef.current, { display: 'block', opacity: 0 })
-            gsap.set(mobileDrawerRef.current, { display: 'block', y: '-100%', opacity: 0 })
-
-            gsap.to(mobileOverlayRef.current, { opacity: 1, duration: 0.3 })
-            gsap.to(mobileDrawerRef.current, {
-                y: '0%',
-                opacity: 1,
-                duration: 0.4,
-                ease: 'power3.out'
-            })
-        } else {
-            gsap.killTweensOf([mobileDrawerRef.current, mobileOverlayRef.current])
-            gsap.to(mobileDrawerRef.current, {
-                y: '-100%',
-                opacity: 0,
-                duration: 0.3,
-                ease: 'power3.in'
-            })
-            gsap.to(mobileOverlayRef.current, {
-                opacity: 0,
-                duration: 0.3,
-                onComplete: () => {
-                    setIsMobileFilterOpen(false)
-                    if (mobileOverlayRef.current) mobileOverlayRef.current.style.display = 'none';
-                    if (mobileDrawerRef.current) mobileDrawerRef.current.style.display = 'none';
-                    document.body.style.overflow = ''
-                }
-            })
-        }
+        setIsMobileFilterOpen(open)
+        document.body.style.overflow = open ? 'hidden' : ''
     }
 
     const scrollNavigation = (direction: 'left' | 'right') => {
@@ -174,109 +151,6 @@ export default function AllPropertiesPage() {
         }
     }
 
-    useEffect(() => {
-        gsap.registerPlugin(ScrollTrigger)
-
-        const ctx = gsap.context(() => {
-            gsap.to(heroRef.current, {
-                y: 50,
-                scale: 0.98,
-                opacity: 0.8,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: heroRef.current,
-                    start: 'top top',
-                    end: 'bottom top',
-                    scrub: 1,
-                }
-            })
-
-            gsap.fromTo('.hero-badge',
-                { opacity: 0, y: -30, scale: 0.8, rotationX: -10 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    scale: 1,
-                    rotationX: 0,
-                    duration: 0.8,
-                    ease: 'back.out(1.7)',
-                    scrollTrigger: {
-                        trigger: heroRef.current,
-                        start: 'top 85%',
-                        toggleActions: 'play none none reverse'
-                    }
-                }
-            )
-
-            const titleChars = document.querySelectorAll('.hero-title-char')
-            gsap.fromTo(titleChars,
-                { opacity: 0, y: 50, rotationX: -15, filter: 'blur(4px)' },
-                {
-                    opacity: 1,
-                    y: 0,
-                    rotationX: 0,
-                    filter: 'blur(0px)',
-                    duration: 0.6,
-                    stagger: 0.04,
-                    ease: 'power3.out',
-                    scrollTrigger: {
-                        trigger: heroRef.current,
-                        start: 'top 85%',
-                        toggleActions: 'play none none reverse'
-                    }
-                }
-            )
-
-            gsap.fromTo('.filter-sidebar',
-                { opacity: 0, x: -50, rotationY: -8 },
-                {
-                    opacity: 1,
-                    x: 0,
-                    rotationY: 0,
-                    duration: 0.9,
-                    ease: 'power3.out',
-                    scrollTrigger: {
-                        trigger: sidebarRef.current,
-                        start: 'top 85%',
-                        toggleActions: 'play none none reverse'
-                    }
-                }
-            )
-
-            gsap.fromTo('.property-card',
-                { opacity: 0, y: 60, scale: 0.95, rotationX: 4 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    scale: 1,
-                    rotationX: 0,
-                    duration: 0.8,
-                    stagger: { amount: 0.5, from: 'start', grid: 'auto' },
-                    ease: 'power4.out',
-                    scrollTrigger: {
-                        trigger: gridRef.current,
-                        start: 'top 85%',
-                        toggleActions: 'play none none reverse'
-                    }
-                }
-            )
-        }, pageRef)
-
-        return () => {
-            ctx.revert()
-            ScrollTrigger.getAll().forEach(t => t.kill())
-            document.body.style.overflow = ''
-        }
-    }, [])
-
-    const splitText = (text: string) => {
-        return text.split('').map((char, i) => (
-            <span key={i} className="hero-title-char inline-block">
-                {char === ' ' ? '\u00A0' : char}
-            </span>
-        ))
-    }
-
     const FiltersLayoutContent = () => (
         <>
             <div className="filter-title flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
@@ -284,12 +158,15 @@ export default function AllPropertiesPage() {
                     <i className="bi bi-sliders text-amber-500 text-base"></i>
                     Premium Filters
                 </h2>
-                <button onClick={resetFilters} className="text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors">
+                <button
+                    onClick={resetFilters}
+                    className="text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors"
+                >
                     Reset All
                 </button>
             </div>
 
-            <div className="filter-section mb-5">
+            <div className="filter-section mb-5" data-aos="fade-up" data-aos-delay="100">
                 <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-2">Search Spaces</label>
                 <div className="relative">
                     <input
@@ -303,18 +180,20 @@ export default function AllPropertiesPage() {
                 </div>
             </div>
 
-            <div className="filter-section mb-5">
+            <div className="filter-section mb-5" data-aos="fade-up" data-aos-delay="200">
                 <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-2">Space Configuration</label>
                 <div className="grid grid-cols-2 gap-1.5">
-                    {allCategories.map(cat => {
+                    {allCategories.map((cat, idx) => {
                         const isActive = categoryFilter === cat;
                         return (
                             <button
                                 key={cat}
                                 onClick={() => setCategoryFilter(cat)}
+                                data-aos="zoom-in"
+                                data-aos-delay={200 + idx * 50}
                                 className={`filter-btn py-2 rounded-xl text-xs font-bold transition-all border ${isActive
-                                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/20 border-transparent'
-                                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/20 border-transparent scale-105'
+                                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:scale-105'
                                     }`}
                             >
                                 <span className={`block text-[10px] tracking-wide ${isActive ? 'text-white font-black' : 'text-slate-600'}`}>
@@ -326,7 +205,7 @@ export default function AllPropertiesPage() {
                 </div>
             </div>
 
-            <div className="filter-section mb-5">
+            <div className="filter-section mb-5" data-aos="fade-up" data-aos-delay="300">
                 <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-2">Budget (₹ Cr)</label>
                 <div className="grid grid-cols-2 gap-2">
                     <input
@@ -334,28 +213,33 @@ export default function AllPropertiesPage() {
                         placeholder="Min"
                         value={budgetMin}
                         onChange={(e) => setBudgetMin(e.target.value)}
-                        className="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-amber-500"
+                        className="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-amber-500 transition-all hover:border-amber-300"
                     />
                     <input
                         type="number"
                         placeholder="Max"
                         value={budgetMax}
                         onChange={(e) => setBudgetMax(e.target.value)}
-                        className="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-amber-500"
+                        className="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-amber-500 transition-all hover:border-amber-300"
                     />
                 </div>
             </div>
 
-            <div className="filter-section mb-5">
+            <div className="filter-section mb-5" data-aos="fade-up" data-aos-delay="400">
                 <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-2">Target Locations</label>
                 <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-1">
-                    {filterLocations.map(loc => (
-                        <label key={loc} className="flex items-center gap-2.5 text-xs font-semibold text-slate-600 cursor-pointer hover:text-slate-900 transition-colors select-none">
+                    {filterLocations.map((loc, idx) => (
+                        <label
+                            key={loc}
+                            data-aos="fade-right"
+                            data-aos-delay={400 + idx * 30}
+                            className="flex items-center gap-2.5 text-xs font-semibold text-slate-600 cursor-pointer hover:text-slate-900 transition-colors select-none group"
+                        >
                             <input
                                 type="checkbox"
                                 checked={selectedLocations.includes(loc)}
                                 onChange={() => toggleLocation(loc)}
-                                className="w-3.5 h-3.5 rounded border-slate-300 text-amber-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                                className="w-3.5 h-3.5 rounded border-slate-300 text-amber-500 focus:ring-0 focus:ring-offset-0 cursor-pointer group-hover:scale-110 transition-transform"
                             />
                             {loc}
                         </label>
@@ -363,11 +247,11 @@ export default function AllPropertiesPage() {
                 </div>
             </div>
 
-            <div className="filter-section grid grid-cols-2 gap-2 border-t border-slate-100 pt-4 mt-2">
-                <button className="flex items-center justify-center gap-1.5 py-2.5 border border-slate-200 hover:border-slate-300 rounded-xl text-xs font-bold text-slate-700 transition-colors bg-white">
+            <div className="filter-section grid grid-cols-2 gap-2 border-t border-slate-100 pt-4 mt-2" data-aos="fade-up" data-aos-delay="500">
+                <button className="flex items-center justify-center gap-1.5 py-2.5 border border-slate-200 hover:border-slate-300 rounded-xl text-xs font-bold text-slate-700 transition-all bg-white hover:shadow-md hover:scale-105">
                     <i className="bi bi-telephone-fill text-slate-500 text-xs"></i> Call Us
                 </button>
-                <button className="flex items-center justify-center gap-1.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm">
+                <button className="flex items-center justify-center gap-1.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm hover:shadow-md hover:scale-105">
                     <i className="bi bi-whatsapp text-sm"></i> Chat
                 </button>
             </div>
@@ -375,10 +259,14 @@ export default function AllPropertiesPage() {
     )
 
     return (
-        <main ref={pageRef} className="min-h-screen bg-[#f8fafc] text-slate-800 antialiased overflow-x-hidden pb-12">
+        <main className="min-h-screen bg-[#f8fafc] text-slate-800 antialiased overflow-x-hidden pb-12">
 
             {/* TOP HEADER WITH SECTORS */}
-            <div className="w-full bg-white border-b border-slate-200 py-3 sticky top-0 z-40 shadow-2xs">
+            <div
+                className="w-full bg-white border-b border-slate-200 py-3 sticky top-0 z-40 shadow-sm"
+                data-aos="fade-down"
+                data-aos-duration="600"
+            >
                 <div className="max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-semibold mb-3 tracking-wide select-none">
                         <Link href="/" className="hover:text-slate-700 transition-colors">Home</Link>
@@ -407,7 +295,10 @@ export default function AllPropertiesPage() {
                                     <Link
                                         key={idx}
                                         href={`/properties/noida/${sectorSlug}`}
-                                        className="shrink-0 px-4 py-1.5 bg-white border border-slate-200 hover:border-amber-500/50 rounded-full text-xs font-semibold text-slate-700 hover:text-amber-600 transition-all shadow-2xs select-none"
+                                        data-aos="zoom-in"
+                                        data-aos-delay={idx * 50}
+                                        data-aos-duration="400"
+                                        className="shrink-0 px-4 py-1.5 bg-white border border-slate-200 hover:border-amber-500/50 hover:scale-105 rounded-full text-xs font-semibold text-slate-700 hover:text-amber-600 transition-all shadow-sm select-none"
                                     >
                                         {sector}
                                     </Link>
@@ -433,39 +324,55 @@ export default function AllPropertiesPage() {
             </div>
 
             {/* Mobile Filter Drawer */}
-            <div
-                ref={mobileOverlayRef}
-                onClick={() => toggleMobileDrawer(false)}
-                className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden opacity-0 lg:hidden"
-            />
-            <div
-                ref={mobileDrawerRef}
-                className="fixed top-0 inset-x-0 bg-white z-50 rounded-b-[28px] border-b border-slate-200 p-6 shadow-2xl max-h-[85vh] overflow-y-auto transform -translate-y-100% opacity-0 hidden lg:hidden"
-            >
-                <div className="flex justify-end mb-2">
-                    <button
+            {isMobileFilterOpen && (
+                <>
+                    <div
                         onClick={() => toggleMobileDrawer(false)}
-                        className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors"
+                        className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 lg:hidden animate-fadeIn"
+                    />
+                    <div
+                        className="fixed top-0 inset-x-0 bg-white z-50 rounded-b-[28px] border-b border-slate-200 p-6 shadow-2xl max-h-[85vh] overflow-y-auto lg:hidden animate-slideDown"
                     >
-                        <i className="bi bi-x-lg text-xs"></i>
-                    </button>
-                </div>
-                <FiltersLayoutContent />
-            </div>
+                        <div className="flex justify-end mb-2">
+                            <button
+                                onClick={() => toggleMobileDrawer(false)}
+                                className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors"
+                            >
+                                <i className="bi bi-x-lg text-xs"></i>
+                            </button>
+                        </div>
+                        <FiltersLayoutContent />
+                    </div>
+                </>
+            )}
 
             <div className="relative max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 py-8 z-10 flex flex-col lg:flex-row gap-8">
 
                 {/* DESKTOP FILTER SIDEBAR */}
-                <aside ref={sidebarRef} className="filter-sidebar hidden lg:block w-[320px] shrink-0 bg-white border border-slate-200 rounded-[24px] p-5 shadow-xs self-start sticky top-36">
+                <aside
+                    className="hidden lg:block w-[320px] shrink-0 bg-white border border-slate-200 rounded-[24px] p-5 shadow-sm self-start sticky top-36"
+                    data-aos="fade-right"
+                    data-aos-duration="800"
+                    data-aos-delay="200"
+                >
                     <FiltersLayoutContent />
                 </aside>
 
                 {/* MAIN CONTENT */}
-                <div ref={mainContentRef} className="flex-1">
+                <div className="flex-1">
 
                     {/* Hero Section */}
-                    <div ref={heroRef} className="mb-10 text-center lg:text-left">
-                        <div className="hero-badge inline-flex items-center gap-2 px-3.5 py-1.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-full mb-4 shadow-md border border-amber-500/20">
+                    <div
+                        className="mb-10 text-center lg:text-left"
+                        data-aos="fade-up"
+                        data-aos-duration="800"
+                    >
+                        <div
+                            className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-full mb-4 shadow-md border border-amber-500/20"
+                            data-aos="zoom-in"
+                            data-aos-delay="200"
+                            data-aos-duration="600"
+                        >
                             <span className="relative flex h-1.5 w-1.5">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
                                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500" />
@@ -475,23 +382,36 @@ export default function AllPropertiesPage() {
                             <span className="text-[10px] font-bold text-slate-300">{allProperties.length} Premium Units</span>
                         </div>
 
-                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-950 tracking-tight leading-none">
+                        <h1
+                            className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-950 tracking-tight leading-none"
+                            data-aos="fade-up"
+                            data-aos-delay="300"
+                        >
                             Industrial &amp;{' '}
-                              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600">
-                            Warehouse
-                        </span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600">
+                                Warehouse
+                            </span>
                             <br className="hidden lg:block" />
                             <span className="text-xl sm:text-2xl font-bold text-slate-500">
-                                {splitText(' Spaces For Rent in Noida')}
+                                Spaces For Rent in Noida
                             </span>
                         </h1>
-                        <p className="hero-desc text-xs font-medium text-slate-500 mt-3 leading-relaxed">
+                        <p
+                            className="text-xs font-medium text-slate-500 mt-3 leading-relaxed"
+                            data-aos="fade-up"
+                            data-aos-delay="400"
+                        >
                             Premium commercial and industrial spaces across prime Noida sectors including Sector 140A, Sector 67, Sector 83, Ecotech 3, and more.
                         </p>
                     </div>
 
                     {/* Results Bar */}
-                    <div className="results-bar bg-white border border-slate-200 rounded-2xl p-3.5 mb-6 flex items-center justify-between gap-4 shadow-xs">
+                    <div
+                        className="results-bar bg-white border border-slate-200 rounded-2xl p-3.5 mb-6 flex items-center justify-between gap-4 shadow-sm"
+                        data-aos="fade-down"
+                        data-aos-delay="200"
+                        data-aos-duration="600"
+                    >
                         <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
                             <span className="font-black text-slate-950 bg-slate-100 px-2 py-0.5 rounded-md">{filteredProperties.length}</span>
                             <span>Listings Found</span>
@@ -516,19 +436,32 @@ export default function AllPropertiesPage() {
                             </select>
 
                             <div className="hidden sm:flex border border-slate-200 rounded-xl p-0.5 bg-slate-50">
-                                <button onClick={() => setViewMode('grid')} className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${viewMode === 'grid' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-400'}`}>Grid</button>
-                                <button onClick={() => setViewMode('list')} className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${viewMode === 'list' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-400'}`}>List</button>
+                                <button
+                                    onClick={() => setViewMode('grid')}
+                                    className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${viewMode === 'grid' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400'}`}
+                                >
+                                    Grid
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('list')}
+                                    className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400'}`}
+                                >
+                                    List
+                                </button>
                             </div>
                         </div>
                     </div>
 
                     {/* Property Cards Grid */}
-                    <div ref={gridRef} className={`grid ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'} gap-6`}>
-                        {filteredProperties.map((property) => (
+                    <div className={`grid ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'} gap-6`}>
+                        {filteredProperties.map((property, index) => (
                             <div
                                 key={property.id}
-                                className="property-card group relative bg-white rounded-[24px] border border-slate-200/90 overflow-hidden shadow-xs hover:border-amber-500/40 transition-all duration-300"
-                                style={{ transformStyle: 'preserve-3d' }}
+                                className="property-card group relative bg-white rounded-[24px] border border-slate-200/90 overflow-hidden shadow-sm hover:border-amber-500/40 hover:shadow-xl transition-all duration-300"
+                                data-aos="fade-up"
+                                data-aos-delay={100 + (index % 6) * 100}
+                                data-aos-duration="600"
+                                data-aos-offset="50"
                             >
                                 <div className="card-glow absolute -inset-20 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-500 z-0">
                                     <div className="w-full h-full bg-radial from-amber-500/10 via-transparent to-transparent blur-2xl rounded-full" />
@@ -538,7 +471,7 @@ export default function AllPropertiesPage() {
                                     <img
                                         src={property.image}
                                         alt={property.title}
-                                        className="card-image w-full h-full object-cover transition-transform duration-700 ease-out"
+                                        className="card-image w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                                         loading="lazy"
                                         onError={(e) => {
                                             (e.target as HTMLImageElement).src = '/img/placeholder.jpg'
@@ -611,7 +544,7 @@ export default function AllPropertiesPage() {
 
                                     <div className="mt-2.5 flex flex-wrap gap-1">
                                         {property.features.slice(0, 3).map((feature, idx) => (
-                                            <span key={idx} className="card-feature flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 text-slate-700 text-[10px] font-bold rounded-lg border border-slate-200/60 shadow-2xs group-hover:border-amber-500/20 transition-colors">
+                                            <span key={idx} className="card-feature flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 text-slate-700 text-[10px] font-bold rounded-lg border border-slate-200/60 shadow-sm group-hover:border-amber-500/20 transition-colors">
                                                 <i className={`${getFeatureIconClass(feature)} text-xs`}></i>
                                                 {feature}
                                             </span>
@@ -624,11 +557,12 @@ export default function AllPropertiesPage() {
                                     </div>
 
                                     <Link
-                                        href={`/properties/${property.id}`}
-                                        className="w-full py-2.5 bg-slate-900 group-hover:bg-amber-500 text-white group-hover:text-slate-950 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2 select-none mt-4"
+                                        href={`/properties/Noida/${property.location
+                                            .split(',')[0].trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')}`}
+                                        className="w-full py-2.5 bg-slate-900 group-hover:bg-amber-500 text-white group-hover:text-slate-950 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center gap-2 select-none mt-4"
                                     >
                                         View Details
-                                        <i className="bi bi-arrow-right-short text-base flex"></i>
+                                        <i className="bi bi-arrow-right-short text-base flex group-hover:translate-x-1 transition-transform"></i>
                                     </Link>
                                 </div>
                             </div>
@@ -636,20 +570,32 @@ export default function AllPropertiesPage() {
                     </div>
 
                     {filteredProperties.length === 0 && (
-                        <div className="text-center py-16">
+                        <div
+                            className="text-center py-16"
+                            data-aos="fade-up"
+                            data-aos-duration="600"
+                        >
                             <div className="text-6xl mb-4">🔍</div>
                             <h3 className="text-xl font-bold text-slate-800">No Properties Found</h3>
                             <p className="text-sm text-slate-500 mt-2">Try adjusting your filters or search terms</p>
-                            <button onClick={resetFilters} className="mt-4 px-6 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold hover:bg-amber-600 transition-colors">
+                            <button
+                                onClick={resetFilters}
+                                className="mt-4 px-6 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold hover:bg-amber-600 transition-colors hover:scale-105"
+                            >
                                 Reset Filters
                             </button>
                         </div>
                     )}
 
-                    <div className="cta-section text-center mt-16">
+                    <div
+                        className="cta-section text-center mt-16"
+                        data-aos="fade-up"
+                        data-aos-delay="200"
+                        data-aos-duration="800"
+                    >
                         <Link
                             href="/contact"
-                            className="cta-button group inline-flex items-center gap-2.5 px-8 py-4 bg-slate-950 hover:bg-amber-500 text-white hover:text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all duration-300 border border-amber-500/30"
+                            className="cta-button group inline-flex items-center gap-2.5 px-8 py-4 bg-slate-950 hover:bg-amber-500 text-white hover:text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all duration-300 border border-amber-500/30 hover:shadow-xl hover:scale-105"
                         >
                             <span className="relative z-10 flex items-center gap-2">
                                 Request On-Site Inspection
@@ -659,6 +605,24 @@ export default function AllPropertiesPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Custom Animations for Mobile Drawer */}
+            <style jsx>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes slideDown {
+                    from { transform: translateY(-100%); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                .animate-fadeIn {
+                    animation: fadeIn 0.3s ease-out;
+                }
+                .animate-slideDown {
+                    animation: slideDown 0.4s ease-out;
+                }
+            `}</style>
         </main>
     )
 }
