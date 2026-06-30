@@ -66,29 +66,32 @@ export default function AboutPageContent() {
       );
 
       // Stats counter animation
-      document.querySelectorAll('.stat-number').forEach((stat) => {
-        const target = parseInt(stat.getAttribute('data-target') || '0');
-        const suffix = stat.getAttribute('data-suffix') || '';
-        
-        gsap.fromTo(stat, 
-          { innerText: '0' },
-          {
-            innerText: target,
-            duration: 2,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: stat,
-              start: "top 85%",
-              toggleActions: "play none none reverse"
-            },
-            onUpdate: function() {
-              const value = Math.round(Number(this.targets()[0].innerText));
-              stat.innerText = value + suffix;
-            }
-          }
-        );
-      });
-
+    // Stats counter animation
+document.querySelectorAll('.stat-number').forEach((el) => {
+  const stat = el as HTMLElement; // Element को HTMLElement में कास्ट करें
+  const target = parseInt(stat.getAttribute('data-target') || '0');
+  const suffix = stat.getAttribute('data-suffix') || '';
+  
+  gsap.fromTo(stat, 
+    { innerText: '0' },
+    {
+      innerText: target,
+      duration: 2,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: stat,
+        start: "top 85%",
+        toggleActions: "play none none reverse"
+      },
+      onUpdate: function() {
+        // targets()[0] को भी HTMLElement कास्ट करें ताकि textContent रीड हो सके
+        const targetEl = this.targets()[0] as HTMLElement;
+        const value = Math.round(Number(targetEl.textContent || '0'));
+        stat.textContent = value + suffix; // innerText की जगह textContent का उपयोग बेहतर है
+      }
+    }
+  );
+});
       // Section animations
       const sections = gsap.utils.toArray('.animate-section');
       sections.forEach((sec: any) => {
