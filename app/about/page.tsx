@@ -1,5 +1,5 @@
 "use client";
-
+// app\about\page.tsx
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Navbar from "@/components/Navbar";
@@ -30,9 +30,17 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 
 // Canvas polyfill for roundRect
 if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
-  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x: number, y: number, w: number, h: number, r: number) {
+    // Handle undefined or null r
+    if (r === undefined || r === null) {
+      r = 0;
+    }
+    // Ensure r is a number
+    r = Number(r);
+    // Apply the radius limits
     if (r > w / 2) r = w / 2;
     if (r > h / 2) r = h / 2;
+    
     this.moveTo(x + r, y);
     this.lineTo(x + w - r, y);
     this.quadraticCurveTo(x + w, y, x + w, y + r);
