@@ -72,7 +72,17 @@ const faqData = [
   }
 ];
 
-function AccordionItem({ question, answer, isOpen, onClick, activeColor }) {
+// ✅ ADD THIS: Define the props interface
+interface AccordionItemProps {
+  question: string;
+  answer: string;
+  isOpen: boolean;
+  onClick: () => void;
+  activeColor: string;
+}
+
+// ✅ ADD THIS: Type the function component with the interface
+function AccordionItem({ question, answer, isOpen, onClick, activeColor }: AccordionItemProps) {
   return (
     <div 
       className={`border bg-white rounded-xl sm:rounded-2xl shadow-sm transition-all duration-300 overflow-hidden mb-3 ${
@@ -111,7 +121,7 @@ function AccordionItem({ question, answer, isOpen, onClick, activeColor }) {
 }
 
 export default function ColorfulFaqPage() {
-  const [openIndex, setOpenIndex] = useState(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   useEffect(() => {
     AOS.init({
@@ -121,7 +131,7 @@ export default function ColorfulFaqPage() {
     });
   }, []);
 
-  const handleToggle = (globalIndex) => {
+  const handleToggle = (globalIndex: number) => {
     setOpenIndex(openIndex === globalIndex ? null : globalIndex);
   };
 
