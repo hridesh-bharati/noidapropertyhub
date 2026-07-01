@@ -69,6 +69,34 @@ export default function SectorPropertyPage() {
         }
     }, [sectorSlug]);
 
+    const handleShare = async () => {
+    const shareData = {
+        title: property?.title || 'Premium Property in Noida',
+        text: `Check out this property: ${property?.title} in ${sectorName}`,
+        url: window.location.href, // Yeh automatically current page ka URL utha lega
+    };
+
+    // Check agar browser native mobile sharing support karta hai (Web Share API)
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        try {
+            await navigator.share(shareData);
+            console.log('Successfully shared');
+        } catch (error) {
+            console.log('Error sharing:', error);
+        }
+    } else {
+        // Fallback: Agar browser support nahi karta (jaise Desktop PC), toh link copy ho jayega
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            alert('Property link copied to clipboard!'); 
+            // Aap alert ki jagah apna custom Toast Notification bhi use kar sakte hain
+        } catch (err) {
+            console.error('Failed to copy link: ', err);
+        }
+    }
+};
+
+
     if (!property) {
         return (
             <>
@@ -88,7 +116,7 @@ export default function SectorPropertyPage() {
     return (
         <>
             <Navbar />
-            <div ref={mainRef} className="min-h-screen pt-16 mt-72 bg-[#F5F0E8] text-[#1E1B17] font-sans antialiased selection:bg-amber-600 selection:text-white bg-[radial-gradient(ellipse_at_top_left,_#FFF5E6_0%,_#F5E6D3_100%)]">
+            <div ref={mainRef} className="min-h-screen pt-16  bg-[#F5F0E8] text-[#1E1B17] font-sans antialiased selection:bg-amber-600 selection:text-white bg-[radial-gradient(ellipse_at_top_left,_#FFF5E6_0%,_#F5E6D3_100%)]">
                 <main className="max-w-full mx-auto px-4 sm:px-6 py-6" >
 
                     {/* BREADCRUMBS */}
@@ -104,9 +132,13 @@ export default function SectorPropertyPage() {
                             <button className="flex items-center space-x-1 hover:text-red-600 bg-white/60 backdrop-blur-md px-3 py-2 rounded-full border border-white/40 shadow-lg hover:shadow-red-100/50 transition-all duration-300">
                                 <Heart className="w-3.5 h-3.5" /> <span>Save</span>
                             </button>
-                            <button className="flex items-center space-x-1 hover:text-blue-600 bg-white/60 backdrop-blur-md px-3 py-2 rounded-full border border-white/40 shadow-lg hover:shadow-blue-100/50 transition-all duration-300">
-                                <Share2 className="w-3.5 h-3.5" /> <span>Share</span>
-                            </button>
+                          {/* Purane button ko isse replace karein */}
+<button 
+    onClick={handleShare}
+    className="flex items-center space-x-1 hover:text-blue-600 bg-white/60 backdrop-blur-md px-3 py-2 rounded-full border border-white/40 shadow-lg hover:shadow-blue-100/50 transition-all duration-300"
+>
+    <Share2 className="w-3.5 h-3.5" /> <span>Share</span>
+</button>
                         </div>
                     </div>
 

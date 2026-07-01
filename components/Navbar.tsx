@@ -1,5 +1,7 @@
 'use client'
+
 // components/Navbar.tsx
+
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import AOS from 'aos'
@@ -10,7 +12,6 @@ import { useRouter, usePathname } from 'next/navigation'
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null)
-  
   const router = useRouter()
   const pathname = usePathname()
 
@@ -70,7 +71,7 @@ export default function Navbar() {
             data-aos="fade-right"
             data-aos-delay="100"
           >
-            <img src="img/logo.jpg" alt="Logo" className="w-[100px] object-contain rounded" />
+            <img src="img/logo.jpg" alt="Logo" className="w-[130px] object-contain rounded" />
           </Link>
 
           {/* Mobile Search Box */}
@@ -113,19 +114,53 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right Side: Login Button with AOS */}
+          {/* Right Side: Premium + Ratings + Login */}
           <div 
-            className="shrink-0 relative z-50"
+            className="shrink-0 relative z-50 flex items-center gap-3"
             data-aos="fade-left"
             data-aos-delay="400"
           >
+      
+            <div 
+              className="hidden md:flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200/60"
+              data-aos="zoom-in"
+              data-aos-delay="550"
+            >
+              <i className="bi bi-shield-check text-emerald-500"></i>
+              <span>100% RERA VERIFIED</span>
+            </div>
+
+            {/* INNOVATION BADGE - NEW */}
+            {/* <div 
+              className="hidden lg:flex items-center gap-1.5 text-xs font-bold text-purple-600 bg-purple-50 px-3 py-1.5 rounded-full border border-purple-200/60"
+              data-aos="zoom-in"
+              data-aos-delay="600"
+            >
+              <i className="bi bi-lightbulb text-purple-500"></i>
+              <span>INNOVATION</span>
+            </div> */}
+
+            {/* WHATSAPP ENQUIRY - NEW */}
+            <a
+              href="https://wa.me/917070759003?text=Hi%20I%20want%20to%20enquire%20about%20properties"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden lg:flex items-center gap-1.5 bg-[#25D366] text-white px-3 py-1.5 rounded-full text-xs font-bold hover:bg-[#1DA851] transition-all shadow-md hover:shadow-lg hover:scale-105"
+              data-aos="zoom-in"
+              data-aos-delay="650"
+            >
+              <i className="bi bi-whatsapp text-sm"></i>
+              <span>WhatsApp Enquiry</span>
+            </a>
+
+            {/* Login / User */}
             {user ? (
               <div className="flex items-center gap-2">
                 <Link
                   href="/admin/dashboard"
                   className="text-xs font-bold bg-[#0066FF] text-white px-5 py-2 rounded-full hover:bg-[#0055DD] transition-all shadow-md hover:shadow-lg hover:scale-105"
                   data-aos="zoom-in"
-                  data-aos-delay="500"
+                  data-aos-delay="700"
                 >
                   Dashboard
                 </Link>
@@ -133,7 +168,7 @@ export default function Navbar() {
                   onClick={handleLogout} 
                   className="text-xs font-bold text-red-500 hover:text-red-600 ml-2 hidden sm:inline-block transition-colors"
                   data-aos="zoom-in"
-                  data-aos-delay="600"
+                  data-aos-delay="750"
                 >
                   <i className="bi bi-box-arrow-right text-base"></i>
                 </button>
@@ -143,7 +178,7 @@ export default function Navbar() {
                 href="/admin/login"
                 className="text-xs font-bold text-white bg-[#0066FF] px-5 py-2 rounded-full hover:bg-[#0055DD] transition-all shadow-md hover:shadow-lg hover:scale-105"
                 data-aos="zoom-in"
-                data-aos-delay="500"
+                data-aos-delay="700"
               >
                 Login
               </Link>

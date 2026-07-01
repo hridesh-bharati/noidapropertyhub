@@ -259,7 +259,7 @@ export default function AllPropertiesPage() {
     )
 
     return (
-        <main className="min-h-screen bg-[#f8fafc] text-slate-800 antialiased overflow-x-hidden pb-12">
+        <main className="bg-[#f8fafc] text-slate-800 antialiased overflow-x-hidden pb-12">
 
             {/* TOP HEADER WITH SECTORS */}
             <div
@@ -349,12 +349,12 @@ export default function AllPropertiesPage() {
             <div className="relative max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 py-8 z-10 flex flex-col lg:flex-row gap-8">
 
                 {/* DESKTOP FILTER SIDEBAR */}
-                <aside
-                    className="hidden lg:block w-[320px] shrink-0 bg-white border border-slate-200 rounded-[24px] p-5 shadow-sm self-start sticky top-36"
-                    data-aos="fade-right"
-                    data-aos-duration="800"
-                    data-aos-delay="200"
-                >
+               <aside
+    className="hidden lg:block w-[320px] shrink-0 bg-white border border-slate-200 rounded-[24px] p-5 shadow-sm self-start sticky top-36"
+    data-aos="fade-right"
+    data-aos-duration="800"
+    data-aos-delay="200"
+>
                     <FiltersLayoutContent />
                 </aside>
 

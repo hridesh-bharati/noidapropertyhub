@@ -22,22 +22,22 @@ export default function Footer() {
             <div className="space-y-4 text-sm font-medium">
               <p className="flex items-start gap-3 hover:text-white transition-colors duration-300">
                 <i className="bi bi-geo-alt-fill text-primary mt-0.5"></i>
-                <span>123 Street, Sector 62, Noida, India</span>
+                <span>Noida, India</span>
               </p>
               <p className="flex items-center gap-3 hover:text-white transition-colors duration-300">
                 <i className="bi bi-telephone-fill text-primary"></i>
-                <span>+012 345 67890</span>
+                <span>7070759003</span>
               </p>
-              <p className="flex items-center gap-3 hover:text-white transition-colors duration-300">
+              {/* <p className="flex items-center gap-3 hover:text-white transition-colors duration-300">
                 <i className="bi bi-envelope-fill text-primary"></i>
-                <span>info@noidapropertyhub.com</span>
-              </p>
+                <span>sushantkumar867695@gmail.com</span>
+              </p> */}
             </div>
             
             {/* Social Media Links with Interactive Micro-interactions */}
             <div className="flex pt-6 space-x-3">
               {[
-                { icon: 'bi-twitter-x', href: '#' },
+                { icon: 'bi-twitter', href: '#' },
                 { icon: 'bi-facebook', href: '#' },
                 { icon: 'bi-youtube', href: '#' },
                 { icon: 'bi-linkedin', href: '#' }
@@ -62,9 +62,8 @@ export default function Footer() {
               {[
                 { name: 'About Us', href: '/about' },
                 { name: 'Contact Us', href: '/contact' },
-                { name: 'Our Services', href: '/services' },
-                { name: 'Privacy Policy', href: '/privacy' },
-                { name: 'Terms & Condition', href: '/terms' }
+                { name: 'Our Services', href: '/properties' },
+                { name: 'Privacy Policy', href: '/cookies' },
               ].map((link, i) => (
                 <Link 
                   key={i} 

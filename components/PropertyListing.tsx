@@ -263,8 +263,8 @@ export default function PropertyListing() {
                 {/* Neon Badges */}
                 <div className="absolute top-3 left-3 flex items-center gap-2">
                   <span className={`px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-wider text-white shadow-md ${property.type === 'For Sell'
-                      ? 'bg-gradient-to-r from-emerald-500 to-teal-600'
-                      : 'bg-gradient-to-r from-pink-500 to-purple-600'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-600'
+                    : 'bg-gradient-to-r from-pink-500 to-purple-600'
                     }`}>
                     {property.type === 'For Sell' ? 'Buy Now' : 'On Rent'}
                   </span>
@@ -311,21 +311,23 @@ export default function PropertyListing() {
                   </span>
                 </div>
 
-                <button className="card-btn w-10 h-10 bg-slate-950 text-white rounded-xl flex items-center justify-center transition-all duration-300 shadow-md hover:bg-slate-900">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  >
-                    <line x1="7" y1="17" x2="17" y2="7"></line>
-                    <polyline points="7 7 17 7 17 17"></polyline>
-                  </svg>
-                </button>
+                <Link href={`/properties`} className="card-btn inline-block  hover:scale-105 transition-transform duration-300">
+                  <button className="card-btn w-10 h-10 bg-slate-950 text-white rounded-xl flex items-center justify-center transition-all duration-300 shadow-md hover:bg-slate-900">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    >
+                      <line x1="7" y1="17" x2="17" y2="7"></line>
+                      <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                  </button>
+                </Link>
               </div>
 
             </div>
