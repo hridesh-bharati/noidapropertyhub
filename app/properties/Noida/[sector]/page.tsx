@@ -89,7 +89,7 @@ export default function SectorPropertyPage() {
         <>
             <Navbar />
             <div ref={mainRef} className="min-h-screen pt-16 mt-72 bg-[#F5F0E8] text-[#1E1B17] font-sans antialiased selection:bg-amber-600 selection:text-white bg-[radial-gradient(ellipse_at_top_left,_#FFF5E6_0%,_#F5E6D3_100%)]">
-                <main className="max-w-full mx-auto px-4 sm:px-6 py-6" style={{ marginTop: "50px" }}>
+                <main className="max-w-full mx-auto px-4 sm:px-6 py-6" >
 
                     {/* BREADCRUMBS */}
                     <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-white/30">

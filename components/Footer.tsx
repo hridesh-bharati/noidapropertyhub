@@ -155,8 +155,8 @@ export default function Footer() {
               {[
                 { name: 'Home', href: '/' },
                 { name: 'Cookies', href: '/cookies' },
-                { name: 'Help', href: '/help' },
-                { name: 'FAQs', href: '/faqs' }
+                { name: 'Help', href: '/contact' },
+                { name: 'FAQs', href: '/faq' }
               ].map((bLink, i) => (
                 <Link key={i} href={bLink.href} className="text-slate-500 hover:text-white transition-colors">
                   {bLink.name}
